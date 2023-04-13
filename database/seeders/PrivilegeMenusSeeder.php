@@ -25,6 +25,26 @@ class PrivilegeMenusSeeder extends Seeder
                     'menu_id' => 2,
                     'created_at' => date('Y-m-d H:i:s')
                 ],
+                [
+                    'user_group_id' => 1,
+                    'menu_id' => 3,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'user_group_id' => 1,
+                    'menu_id' => 4,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'user_group_id' => 1,
+                    'menu_id' => 5,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'user_group_id' => 1,
+                    'menu_id' => 6,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
             ]
         );
     }

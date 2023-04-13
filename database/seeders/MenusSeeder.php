@@ -20,8 +20,8 @@ class MenusSeeder extends Seeder
                     'name' => 'Dashboard',
                     'url' => 'dashboard',
                     'icon' => 'bx bxs-dashboard',
-                    'sort' => '1',
-                    'is_active' => '1',
+                    'sort' => 1,
+                    'is_active' => 1,
                     'created_at' => date('Y-m-d H:i:s')
                 ],
                 [
@@ -29,10 +29,46 @@ class MenusSeeder extends Seeder
                     'name' => 'Management System',
                     'url' => '#',
                     'icon' => 'bx bxs-cog',
-                    'sort' => '2',
-                    'is_active' => '1',
+                    'sort' => 2,
+                    'is_active' => 1,
                     'created_at' => date('Y-m-d H:i:s')
-                ]
+                ],
+                [
+                    'parent_id' => 2,
+                    'name' => 'Brand',
+                    'url' => 'brand',
+                    'icon' => 'bx bx-desktop',
+                    'sort' => 1,
+                    'is_active' => 1,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'parent_id' => 2,
+                    'name' => 'Admin Menus',
+                    'url' => 'admin-menu',
+                    'icon' => 'bx bxs-food-menu',
+                    'sort' => 2,
+                    'is_active' => 1,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'parent_id' => 2,
+                    'name' => 'User Accounts',
+                    'url' => 'accounts',
+                    'icon' => 'bx bxs-user-circle',
+                    'sort' => 3,
+                    'is_active' => 1,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'parent_id' => 2,
+                    'name' => 'User Group & Privileges',
+                    'url' => 'privileges',
+                    'icon' => 'bx bx-building-house',
+                    'sort' => 4,
+                    'is_active' => 1,
+                    'created_at' => date('Y-m-d H:i:s')
+                ],
             ]
         );
     }
