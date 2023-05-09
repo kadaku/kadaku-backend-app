@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens as SanctumHasApiTokens;
-use Illuminate\Foundation\Auth\AuthModel as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
 class AuthModel extends Authenticatable

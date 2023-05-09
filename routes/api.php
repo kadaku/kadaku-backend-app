@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BrandController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +29,8 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     
     Route::middleware('auth:sanctum')->group(function () {
-
-        Route::prefix('/profile')->group(function () {
+        
+        Route::prefix('/user')->group(function () {
             Route::get('/', 'profile');
             Route::put('/{id}', 'update_profile');
         });
