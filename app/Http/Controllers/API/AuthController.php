@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Mail\VerifyEmail;
+use App\Models\API\CustomerVerifyModel;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\AuthModel;
@@ -12,36 +13,60 @@ use App\Notifications\WelcomeEmailNotification;
 use Illuminate\Support\Facades\Storage;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail as Mail;
 use Illuminate\Validation\Rules\File;
-
+use Illuminate\Support\Str;
+use Twilio\Rest\Verify;
 
 class AuthController extends Controller
 {
+    private $domain;
     
+    function __construct()
+    {
+        $this->domain = 'https://kadaku.id/';
+    }
+    
+
     function register(Request $request)
     {
-        $check = AuthModel::where('email', $request->email)->first();
-        if ($check) {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:100',
+            'email' => 'required|string|email|max:100|unique:m_customers',
+            'password' => 'required|string|min:8',
+            'phone_number' => 'required|min:10|numeric',
+        ]);
+
+        if ($validator->fails()) {
             return response()->json([
-                'status' => true,
+                'code' => 400,
+                'status' => false,
+                'data' => $validator->errors(),
+            ], 200);
+        }
+
+        $phone_number = $request->phone_number;
+        if ($request->phone_number[0] === "0") {
+            $phone_number = substr($phone_number, 1);
+        }
+
+        if ($phone_number[0] === "8") {
+            $phone_number = "62" . $phone_number;
+        }
+        $check_email = AuthModel::where('email', $request->email)->first();
+        $check_phone = AuthModel::where('phone', $phone_number)->first();
+        if ($check_email) {
+            return response()->json([
+                'code' => 200,
+                'status' => false,
                 'message' => 'Your email is registered',
-            ], Response::HTTP_OK);
+            ], 200);
+        } else if ($check_phone) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Your number phone is registered',
+            ], 200);
         } else {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:m_customers',
-                'password' => 'required|string|min:8',
-                'phone_number' => 'required|min:10|max:13',
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json([
-                    'code' => 400,
-                    'status' => false,
-                    'data' => $validator->errors(),
-                ], Response::HTTP_OK);
-            }
-    
             $photo = $request->file('photo');
             $file_ext = NULL;
             $file_name = NULL;
@@ -50,15 +75,6 @@ class AuthController extends Controller
                 $file_ext = $photo->getClientOriginalExtension();
                 $file_name = 'ava-'.time().'-'.sha1($request->name.$request->phone_number);
                 $file_path = $photo->storeAs('images/customers', $file_name.'.'.$photo->getClientOriginalExtension(), 'public');
-            }
-    
-            $phone_number = $request->phone_number;
-            if ($request->phone_number[0] === "0") {
-                $phone_number = substr($phone_number, 1);
-            }
-    
-            if ($phone_number[0] === "8") {
-                $phone_number = "62" . $phone_number;
             }
     
             if ($file_path !== '') {
@@ -80,23 +96,33 @@ class AuthController extends Controller
                 // $this->whatsappNotification($auth->phone, $auth->name);
                 // $auth->notify(new WelcomeEmailNotification($auth));
                 $token = $auth->createToken('auth_token')->plainTextToken;
-        
+                
+                // verifiy email send
+                $token_verify = Str::random(64);
+                $url_verify = url('api/email/verify/'.$auth->id.'?expires=') . strtotime(now()->addHours(24)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($auth->id . $token_verify);
+                CustomerVerifyModel::create([
+                    'customer_id' => $auth->id, 
+                    'token' => $token_verify,
+                ]);
+
+                Mail::to($request->email)->send(new VerifyEmail($request->name, $url_verify));
+
                 return response()->json([
                     'code' => 200,
                     'status' => true,
+                    'message' => 'Registration success, You need to confirm your account. We have sent you an activation code, please check your email.',
                     'data' => $auth,
                     'token' => $token,
                     'token_type' => 'Bearer',
-                ], Response::HTTP_OK);
+                ], 200);
             } else {
                 return response()->json([
                     'code' => 400,
                     'status' => false,
-                    'message' => 'Failed Registration'
-                ], Response::HTTP_BAD_GATEWAY);
+                    'message' => 'Failed registration'
+                ], 400);
             }
         }
-
     }
 
     private function whatsappNotification($recipient, $username)
@@ -121,7 +147,7 @@ class AuthController extends Controller
                 'code' => 400,
                 'status' => false,
                 'data' => $validator->errors(),
-            ], Response::HTTP_OK);
+            ], 200);
         }
 
         if (!Auth::guard('api')->attempt($request->only('email', 'password')))
@@ -130,35 +156,37 @@ class AuthController extends Controller
                 'code' => 401,
                 'status' => false, 
                 'message' => 'The email and password you entered do not match',
-            ], Response::HTTP_OK);
+            ], 200);
         }
 
-        $auth = AuthModel::where('email', $request['email'])->where('is_active', 1)->first();
+        $auth = AuthModel::where('email', $request['email'])->where('is_active', 1)->where('email_verified_at', '!=', NULL)->first();
         if ($auth) {
             $token = $auth->createToken('auth_token')->plainTextToken;
+            $minutes = time() + 60 * 60 * 3;
+            setcookie('refreshToken', $token, $minutes, '', '', true, true);
             return response()->json([
                 'code' => 200,
                 'status' => true,
                 'message' => 'Welcome ' . $auth->name,
                 'token' => $token, 
-                'is_verified' => 1,
+                'is_verified' => 1, 
                 'token_type' => 'Bearer', 
-            ], Response::HTTP_OK);
+            ], 200);
         } else {
-            $auth = AuthModel::where('email', $request['email'])->where('is_active', 0)->first();
+            $auth = AuthModel::where('email', $request['email'])->where('is_active', 0)->where('email_verified_at', NULL)->first();
             if ($auth) {
                 return response()->json([
                     'code' => 200,
                     'status' => true,
                     'is_verified' => 0,
                     'message' => 'Your account has not been verified', 
-                ], Response::HTTP_OK);
+                ], 200);
             } else {
                 return response()->json([
                     'code' => 404,
                     'status' => false,
-                    'message' => 'Opss, Account not found', 
-                ], Response::HTTP_NOT_FOUND);
+                    'message' => 'Opss, account not found', 
+                ], 404);
             }
         }
     }
@@ -178,13 +206,13 @@ class AuthController extends Controller
                     'phone' => $data->phone,
                     'photo' => asset('storage/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext),
                 ]
-            ], Response::HTTP_OK);
+            ], 200);
         } else {
             return response()->json([
                 'code' => 404,
                 'status' => false,
                 'message' => 'Data not found', 
-            ], Response::HTTP_NOT_FOUND);
+            ], 404);
         }
     }
 
@@ -200,7 +228,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
+            return response()->json($validator->errors(), 400);
         }
 
         $photo = $request->file('photo');
@@ -250,13 +278,13 @@ class AuthController extends Controller
                     'name' => $data_param['name'],
                     'photo' => asset('storage/images/customers/'.base64_decode($data_param['photo']).'.'.$data_param['photo_ext']),
                 ],
-            ], Response::HTTP_OK);
+            ], 200);
         } else {
             return response()->json([
                 'code' => 400,
                 'status' => false,
                 'message' => 'Failed change data profile',
-            ], Response::HTTP_BAD_GATEWAY);
+            ], 400);
         }
     }
 
@@ -267,6 +295,68 @@ class AuthController extends Controller
             'code' => 200,
             'status' => true,
             'message' => 'You have logged out',
-        ], Response::HTTP_OK);
+        ], 200);
+    }
+
+    function verify(Request $request, $id)
+    {
+        $expires = $request->expires;
+        $hash = $request->hash;
+        $ref = $request->ref;
+        $signature = $request->signature;
+        $valid_signature = sha1($id . $request->hash);
+        if ($ref == 'account_registration') {
+            if ($valid_signature !== $signature) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => false,
+                    'message' => 'The signature you sent is invalid',
+                ], 400);    
+            }
+    
+            if ($expires < strtotime(now()) ) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => false,
+                    'message' => 'Invalid/expired url provided.',
+                ], 400);
+            }
+    
+            $verify_user = CustomerVerifyModel::where('token', $hash)->where('customer_id', $id)->first();
+            if (!is_null($verify_user)) {
+                $user = AuthModel::where('id', $id)->first();
+                if (!$user->email_verified_at && ($user->is_active == 0)) {
+                    AuthModel::where('id', $id)->where('email_verified_at', NULL)->update(['email_verified_at' => now(), 'is_active' => 1]);
+                    $response = [
+                        'code' => 200,
+                        'status' => true,
+                        'message' => 'Your email is verified. You can now login.',
+                    ];
+                    $second = strtotime(now()->addSecond(10));
+                    setcookie('is_verified', 1, $second, 'verified', $this->domain, true, true);
+                    return redirect()->away($this->domain.'verify');
+                } else {
+                    $response = [
+                        'code' => 200,
+                        'status' => false,
+                        'message' => 'Your email is already verified. You can now login.',
+                    ];
+                    return redirect()->away($this->domain.'auth/login');
+                }
+            } else {
+                $response = [
+                    'code' => 400,
+                    'status' => false,
+                    'message' => 'Sorry your email cannot be identified.',
+                ];
+                return response()->json($response, 400);
+            }
+        } else {
+            return response()->json([
+                'code' => 400,
+                'status' => false,  
+                'message' => 'Access denied',
+            ], 400);
+        }
     }
 }

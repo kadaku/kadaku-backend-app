@@ -75,7 +75,7 @@ class BrandController extends Controller
         if ($file_brand) {
             Storage::delete('public/images/brand/'.base64_decode($data_old->logo).'.'.$data_old->logo_ext);
             $file_brand_ext = $file_brand->getClientOriginalExtension();
-            $file_brand_name = 'brand-'.time().'-'.sha1($request->name);
+            $file_brand_name = 'logo';
             $file_brand_path = $file_brand->storeAs('images/brand', $file_brand_name.'.'.$file_brand->getClientOriginalExtension(), 'public');
         }
 
@@ -87,7 +87,7 @@ class BrandController extends Controller
         if ($file_brand_light) {
             Storage::delete('public/images/brand/'.base64_decode($data_old->logo_light).'.'.$data_old->logo_light_ext);
             $file_brand_light_ext = $file_brand_light->getClientOriginalExtension();
-            $file_brand_light_name = 'brand-light-'.time().'-'.sha1($request->name);
+            $file_brand_light_name = 'logo_light';
             $file_brand_light_path = $file_brand_light->storeAs('images/brand', $file_brand_light_name.'.'.$file_brand_light->getClientOriginalExtension(), 'public');
         }
 
@@ -99,7 +99,7 @@ class BrandController extends Controller
         if ($favicon) {
             Storage::delete('public/images/brand/'.base64_decode($data_old->favicon).'.'.$data_old->favicon_ext);
             $file_favicon_ext = $favicon->getClientOriginalExtension();
-            $file_favicon_name = 'favicon-'.time().'-'.sha1($request->name);
+            $file_favicon_name = 'favicon';
             $file_favicon_path = $favicon->storeAs('images/brand', $file_favicon_name.'.'.$favicon->getClientOriginalExtension(), 'public');
         }
 

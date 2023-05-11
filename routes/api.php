@@ -24,12 +24,14 @@ Route::middleware(['api_key'])->group(function () {
     Route::get('/brand', [BrandController::class, 'index']);
 });
 
+Route::get('email/verify/{id}', [AuthController::class, 'verify'])->name('user.verify'); 
+
 Route::controller(AuthController::class)->group(function () {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
+
     
     Route::middleware('auth:sanctum')->group(function () {
-        
         Route::prefix('/user')->group(function () {
             Route::get('/', 'profile');
             Route::put('/{id}', 'update_profile');
