@@ -18,6 +18,7 @@ return new class extends Migration
 
             $table->id();
             $table->unsignedBigInteger('customer_id');
+            $table->string('name', 100)->nullable();
             $table->string('token', 100)->nullable();
             $table->timestamps();
 

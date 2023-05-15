@@ -57,12 +57,13 @@ class AuthController extends Controller
         $check_phone = AuthModel::where('phone', $phone_number)->first();
         if ($check_email) {
             return response()->json([
-                'code' => 200,
+                'code' => 401,
                 'status' => false,
                 'message' => 'Your email is registered',
             ], 200);
         } else if ($check_phone) {
             return response()->json([
+                'code' => 401,
                 'status' => false,
                 'message' => 'Your number phone is registered',
             ], 200);
@@ -95,13 +96,13 @@ class AuthController extends Controller
             if ($auth) {
                 // $this->whatsappNotification($auth->phone, $auth->name);
                 // $auth->notify(new WelcomeEmailNotification($auth));
-                $token = $auth->createToken('auth_token')->plainTextToken;
-                
+                $token = $auth->createToken('verify_token', ['*'], now()->addMinutes(10))->plainTextToken;
                 // verifiy email send
                 $token_verify = Str::random(64);
-                $url_verify = url('api/email/verify/'.$auth->id.'?expires=') . strtotime(now()->addHours(24)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($auth->id . $token_verify);
+                $url_verify = url('api/email/verify/'.$auth->id.'?expires=') . strtotime(now()->addMinutes(10)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($auth->id . $token_verify);
                 CustomerVerifyModel::create([
                     'customer_id' => $auth->id, 
+                    'name' => 'verify_token',
                     'token' => $token_verify,
                 ]);
 
@@ -110,7 +111,7 @@ class AuthController extends Controller
                 return response()->json([
                     'code' => 200,
                     'status' => true,
-                    'message' => 'Registration success, You need to confirm your account. We have sent you an activation code, please check your email.',
+                    'message' => 'You need to confirm your account. We have sent you an activation code, please check your email.',
                     'data' => $auth,
                     'token' => $token,
                     'token_type' => 'Bearer',
@@ -159,27 +160,26 @@ class AuthController extends Controller
             ], 200);
         }
 
-        $auth = AuthModel::where('email', $request['email'])->where('is_active', 1)->where('email_verified_at', '!=', NULL)->first();
+        $auth = AuthModel::where('email', $request->email)->where('is_active', 1)->where('email_verified_at', '!=', NULL)->first();
         if ($auth) {
-            $token = $auth->createToken('auth_token')->plainTextToken;
-            $minutes = time() + 60 * 60 * 3;
-            setcookie('refreshToken', $token, $minutes, '', '', true, true);
+            $token = $auth->createToken('login_token', ['*'], now()->addHours(5))->plainTextToken;
             return response()->json([
                 'code' => 200,
                 'status' => true,
                 'message' => 'Welcome ' . $auth->name,
                 'token' => $token, 
-                'is_verified' => 1, 
                 'token_type' => 'Bearer', 
             ], 200);
         } else {
-            $auth = AuthModel::where('email', $request['email'])->where('is_active', 0)->where('email_verified_at', NULL)->first();
+            $auth = AuthModel::where('email', $request->email)->where('is_active', 0)->where('email_verified_at', NULL)->first();
             if ($auth) {
+                $token = $auth->createToken('verify_token', ['*'], now()->addMinutes(10))->plainTextToken;
                 return response()->json([
                     'code' => 200,
                     'status' => true,
-                    'is_verified' => 0,
-                    'message' => 'Your account has not been verified', 
+                    'message' => 'Your account has not been verified',
+                    'token' => $token, 
+                    'token_type' => 'Bearer', 
                 ], 200);
             } else {
                 return response()->json([
@@ -205,6 +205,7 @@ class AuthController extends Controller
                     'email' => $data->email,
                     'phone' => $data->phone,
                     'photo' => asset('storage/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext),
+                    'is_verified' => $data->is_active,
                 ]
             ], 200);
         } else {
@@ -311,7 +312,7 @@ class AuthController extends Controller
                     'code' => 400,
                     'status' => false,
                     'message' => 'The signature you sent is invalid',
-                ], 400);    
+                ], 200);    
             }
     
             if ($expires < strtotime(now()) ) {
@@ -319,7 +320,7 @@ class AuthController extends Controller
                     'code' => 400,
                     'status' => false,
                     'message' => 'Invalid/expired url provided.',
-                ], 400);
+                ], 200);
             }
     
             $verify_user = CustomerVerifyModel::where('token', $hash)->where('customer_id', $id)->first();
@@ -332,9 +333,7 @@ class AuthController extends Controller
                         'status' => true,
                         'message' => 'Your email is verified. You can now login.',
                     ];
-                    $second = strtotime(now()->addSecond(10));
-                    setcookie('is_verified', 1, $second, 'verified', $this->domain, true, true);
-                    return redirect()->away($this->domain.'verify');
+                    return redirect()->away($this->domain.'auth/login');
                 } else {
                     $response = [
                         'code' => 200,
@@ -349,14 +348,19 @@ class AuthController extends Controller
                     'status' => false,
                     'message' => 'Sorry your email cannot be identified.',
                 ];
-                return response()->json($response, 400);
+                return response()->json($response, 200);
             }
         } else {
             return response()->json([
                 'code' => 400,
                 'status' => false,  
                 'message' => 'Access denied',
-            ], 400);
+            ], 200);
         }
+    }
+
+    function resend_verify(Request $request)
+    {
+        
     }
 }

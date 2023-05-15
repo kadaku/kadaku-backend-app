@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\ResetPassword;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,5 +40,10 @@ Route::controller(AuthController::class)->group(function () {
 
         Route::get('/logout', 'logout');
     });
-
 });
+
+Route::controller(ResetPassword::class)->group(function () {
+    Route::post('/reset-password/send-mail', 'send_mail');
+});
+
+
