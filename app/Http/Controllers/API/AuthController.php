@@ -99,9 +99,9 @@ class AuthController extends Controller
                 $token = $auth->createToken('verify_token', ['*'], now()->addMinutes(10))->plainTextToken;
                 // verifiy email send
                 $token_verify = Str::random(64);
-                $url_verify = url('api/email/verify/'.$auth->id.'?expires=') . strtotime(now()->addMinutes(10)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($auth->id . $token_verify);
+                $url_verify = url('api/email/verify/'.$request->id['id'].'?expires=') . strtotime(now()->addMinutes(10)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($request->id['id'] . $token_verify);
                 CustomerVerifyModel::create([
-                    'customer_id' => $auth->id, 
+                    'customer_id' => $request->id['id'], 
                     'name' => 'verify_token',
                     'token' => $token_verify,
                 ]);
@@ -111,7 +111,7 @@ class AuthController extends Controller
                 return response()->json([
                     'code' => 200,
                     'status' => true,
-                    'message' => 'You need to confirm your account. We have sent you an activation code, please check your email.',
+                    'message' => 'You need to confirm your account. We have sent you an link activation, please check your email.',
                     'data' => $auth,
                     'token' => $token,
                     'token_type' => 'Bearer',
@@ -361,6 +361,37 @@ class AuthController extends Controller
 
     function resend_verify(Request $request)
     {
-        
+        $ref = $request->ref;
+        if ($ref == 'account_registration') {
+            if ($request->id['is_verified'] == 0) {
+                // verifiy email send
+                $token_verify = Str::random(64);
+                $url_verify = url('api/email/verify/'.$request->id['id'].'?expires=') . strtotime(now()->addMinutes(10)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($request->id['id'] . $token_verify);
+                CustomerVerifyModel::create([
+                    'customer_id' => $request->id['id'],
+                    'name' => 'verify_token',
+                    'token' => $token_verify,
+                ]);
+                Mail::to($request->id['email'])->send(new VerifyEmail($request->id['name'], $url_verify));
+    
+                return response()->json([
+                    'code' => 200,
+                    'status' => true,
+                    'message' => 'Email verification has been send to your mail. Please check email',
+                ]);
+            } else {
+                return response()->json([
+                    'code' => 200,
+                    'status' => false,
+                    'message' => 'Account has been verified',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'code' => 400,
+                'status' => false,  
+                'message' => 'Access denied',
+            ], 200);
+        }
     }
 }

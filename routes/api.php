@@ -40,6 +40,10 @@ Route::controller(AuthController::class)->group(function () {
 
         Route::get('/logout', 'logout');
     });
+
+    Route::group(['middleware' => ['throttle:6,1', 'auth:sanctum']], function () {
+        Route::post('/email/verify/resend', 'resend_verify')->name('verification.resend');
+    });
 });
 
 Route::controller(ResetPassword::class)->group(function () {
