@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_customers_verify', function (Blueprint $table) {
+        Schema::create('m_customers_social', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_general_ci';
 
             $table->id();
             $table->unsignedBigInteger('customer_id');
-            $table->string('name', 100)->nullable();
-            $table->string('token', 100)->nullable();
-            $table->timestamp('expires_at')->nullable();
+            $table->string('service_id')->nullable()->unique();
+            $table->string('service_name');
             $table->timestamps();
 
             // indexes
@@ -36,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_customers_verify');
+        Schema::dropIfExists('m_customers_social');
     }
 };

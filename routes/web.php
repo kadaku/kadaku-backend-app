@@ -24,6 +24,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
          */
         Route::get('/login', 'LoginController@show')->name('login.show');
         Route::post('/login', 'LoginController@login')->name('login.perform');
+
+        Route::get('/', function () {
+            return view('home.index');
+        });
     });
 
     Route::group(['middleware' => ['admin']], function() {
@@ -35,7 +39,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         /**
          * Dashboard Routes
          */
-        Route::get('/', 'DashboardController@index')->name('dashboard.index');
         Route::get('/dashboard', 'DashboardController@index')->name('dashboard.index');
 
 

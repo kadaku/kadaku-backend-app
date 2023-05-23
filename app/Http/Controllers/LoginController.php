@@ -42,6 +42,6 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user) 
     {
-        return redirect()->intended();
+        return redirect('dashboard');
     }
 }

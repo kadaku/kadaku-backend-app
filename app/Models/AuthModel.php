@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\API\CustomerSocialModel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,9 @@ class AuthModel extends Authenticatable implements MustVerifyEmail
         'phone_code',
         'phone_dial_code',
         'phone',
+        'photo',
+        'photo_ext',
+        'avatar',
         'is_active',
         'remember_token',
     ];
@@ -33,4 +37,14 @@ class AuthModel extends Authenticatable implements MustVerifyEmail
     protected $cast = [
         'email_verified_at' => 'datetime',
     ];
+
+    function social()
+    {
+        return $this->hasMany(CustomerSocialModel::class, 'customer_id', 'id');
+    }
+
+    function hasSocialLinked($service)
+    {
+        return $this->social->where('service_name', $service)->count();
+    }
 }

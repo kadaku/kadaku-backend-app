@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('phone', 20);
             $table->binary('photo')->nullable();
             $table->string('photo_ext', 4)->nullable();
+            $table->longText('avatar')->nullable();
             $table->tinyInteger('is_active')->default(0);
             $table->rememberToken();
             $table->timestamps();

@@ -99,9 +99,9 @@ class AuthController extends Controller
                 $token = $auth->createToken('verify_token', ['*'], now()->addMinutes(10))->plainTextToken;
                 // verifiy email send
                 $token_verify = Str::random(64);
-                $url_verify = url('api/email/verify/'.$request->id['id'].'?expires=') . strtotime(now()->addMinutes(10)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($request->id['id'] . $token_verify);
+                $url_verify = url('api/email/verify/'.$auth->id.'?expires=') . strtotime(now()->addMinutes(10)) . '&ref=account_registration' . '&hash='.$token_verify . '&signature=' . sha1($auth->id . $token_verify);
                 CustomerVerifyModel::create([
-                    'customer_id' => $request->id['id'], 
+                    'customer_id' => $auth->id, 
                     'name' => 'verify_token',
                     'token' => $token_verify,
                 ]);
@@ -169,6 +169,7 @@ class AuthController extends Controller
                 'message' => 'Welcome ' . $auth->name,
                 'token' => $token, 
                 'token_type' => 'Bearer', 
+                'is_verified' => $auth->is_active,
             ], 200);
         } else {
             $auth = AuthModel::where('email', $request->email)->where('is_active', 0)->where('email_verified_at', NULL)->first();
@@ -180,6 +181,7 @@ class AuthController extends Controller
                     'message' => 'Your account has not been verified',
                     'token' => $token, 
                     'token_type' => 'Bearer', 
+                    'is_verified' => $auth->is_active,
                 ], 200);
             } else {
                 return response()->json([
@@ -204,7 +206,8 @@ class AuthController extends Controller
                     'name' => $data->name,
                     'email' => $data->email,
                     'phone' => $data->phone,
-                    'photo' => asset('storage/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext),
+                    'photo' => !empty($data->photo) ? asset('storage/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext) : '',
+                    'avatar' => !empty($data->avatar) ? $data->avatar : '',
                     'is_verified' => $data->is_active,
                 ]
             ], 200);

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\SocialAuthController;
 use App\Http\Controllers\ResetPassword;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,12 @@ use Illuminate\Support\Facades\Storage;
 Route::middleware(['api_key'])->group(function () {
     // rute-rute yang memerlukan autentikasi API key
     Route::get('/brand', [BrandController::class, 'index']);
+
+    Route::controller(ResetPassword::class)->group(function () {
+        Route::post('/reset-password/send-mail', 'send_mail');
+        Route::post('/reset-password/validate-token', 'validate_token');
+        Route::post('/reset-password/change', 'change');
+    });
 });
 
 Route::get('email/verify/{id}', [AuthController::class, 'verify'])->name('user.verify'); 
@@ -46,8 +53,9 @@ Route::controller(AuthController::class)->group(function () {
     });
 });
 
-Route::controller(ResetPassword::class)->group(function () {
-    Route::post('/reset-password/send-mail', 'send_mail');
-});
 
+Route::controller(SocialAuthController::class)->group(function () {
+    Route::get('/auth/login/{service}', 'redirect');
+    Route::get('/auth/login/{service}/callback', 'callback');
+});
 
