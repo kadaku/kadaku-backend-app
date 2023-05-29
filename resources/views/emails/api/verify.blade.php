@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Verifikasi Email</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <style>
     html, body, div, span, applet, object, iframe,
     h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -60,10 +60,9 @@
 
     .card {
       margin: auto;
-      margin-top: -200px;
       border-radius: 15px;
       text-align: center;
-      padding: 3rem;
+      padding: 3rem 1rem;
       background-color: white;
       z-index: 2;
     }
@@ -91,11 +90,11 @@
     }
   </style>
 </head>
-<body style="width: 100%;height: 100%;font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif ;background-color: #eee;">
-  <div style="width: 100%;height: 250px; position: relative;background-color: #FDD991;z-index: 0;border-bottom-left-radius: 80px;border-bottom-right-radius: 80px;"></div>
+<body style="width: 100%;height: 100%;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif ;background-color: #eee;">
   <div class="container"> 
+    <br>
     <div class="card">
-      <img src="https://ws.kadaku.id/storage/images/brand/brand-1681398871-3ad879a2288ad0d5c138df60185ef7fcec41d7bb.png" width="60" style="margin-bottom: 40px;" alt="">
+      <img src="https://ws.kadaku.id/storage/images/brand/logo.png" width="60" style="margin-bottom: 40px;" alt="">
       <h1 style="font-size: 20px;font-weight: 700;margin-bottom: 15px;">Verify Your Email Address</h1>
       <hr style="border-style: dashed;border-top: 0.9px;border-color: lightgray">
       <h6 style="font-size: 14px">Hello, <span style="font-weight: 700;">{{ isset($name) ? $name : '' }}</span></h6>
@@ -113,7 +112,8 @@
       </small>
     </div>
   </div>
-  <footer style="margin-top:40px; margin-bottom: 45px; text-align: center; font-size: 12px; color: #999">
+  <br>
+  <footer style="text-align: center; font-size: 12px; color: #999">
     <ul style="box-sizing: border-box;line-height: 1.4;font-size: 12px;padding: 0;text-align: center;margin-bottom: 10px">
       <li style="box-sizing: border-box;list-style: none;padding: 0 8px;margin: 0;display: inline-block;border-right: solid 1px #ddd">
         <a href="https://kadaku.id/blog" target="_blank" style="box-sizing: border-box;color: #999;text-decoration: none">Blog</a>
@@ -130,5 +130,6 @@
     </ul>
     <p class="">© {{ date('Y') }} - <a href="https://kadaku.id" style="color: #EC595A;text-decoration: none">kadaku.id</a>. All rights reserved. Indonesia</p>
   </footer>
+  <br>
 </body>
 </html>

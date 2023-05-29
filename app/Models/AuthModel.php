@@ -23,11 +23,14 @@ class AuthModel extends Authenticatable implements MustVerifyEmail
         'password',
         'phone_code',
         'phone_dial_code',
+        'phone_domestic',
+        'phone_iso2',
         'phone',
         'photo',
         'photo_ext',
         'avatar',
         'is_active',
+        'known_source',
         'remember_token',
     ];
     protected $hidden = [

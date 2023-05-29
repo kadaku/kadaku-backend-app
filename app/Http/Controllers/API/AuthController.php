@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Mail\VerifyEmail;
+use App\Models\API\CustomerSocialModel;
 use App\Models\API\CustomerVerifyModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,22 +20,19 @@ use Illuminate\Support\Str;
 use Twilio\Rest\Verify;
 
 class AuthController extends Controller
-{
-    private $domain;
-    
+{    
     function __construct()
     {
-        $this->domain = 'https://kadaku.id/';
+
     }
     
-
     function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:100|unique:m_customers',
             'password' => 'required|string|min:8',
-            'phone_number' => 'required|min:10|numeric',
+            'phone_number' => 'required|min:10|numeric|unique:m_customers,phone',
         ]);
 
         if ($validator->fails()) {
@@ -51,16 +49,26 @@ class AuthController extends Controller
         }
 
         if ($phone_number[0] === "8") {
-            $phone_number = "62" . $phone_number;
+            // $phone_number = "62" . $phone_number;
+            $phone_number = $phone_number;
         }
         $check_email = AuthModel::where('email', $request->email)->first();
         $check_phone = AuthModel::where('phone', $phone_number)->first();
         if ($check_email) {
-            return response()->json([
-                'code' => 401,
-                'status' => false,
-                'message' => 'Your email is registered',
-            ], 200);
+            $check_register_social = CustomerSocialModel::where('customer_id', $check_email->id)->first();
+            if ($check_register_social) {
+                return response()->json([
+                    'code' => 401,
+                    'status' => false,
+                    'message' => 'Your email is registered, Please login by ' . ucwords($check_register_social->service_name),
+                ], 200);
+            } else {
+                return response()->json([
+                    'code' => 401,
+                    'status' => false,
+                    'message' => 'Your email is registered',
+                ], 200);
+            }
         } else if ($check_phone) {
             return response()->json([
                 'code' => 401,
@@ -88,12 +96,22 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'phone_code' => $request->phone_code,
                 'phone_dial_code' => $request->phone_dial_code,
+                'phone_domestic' => $request->phone_domestic,
+                'phone_iso2' => $request->phone_iso2,
                 'phone' => $phone_number,
                 'photo' => $file_name,
                 'photo_ext' => $file_ext,
+                'known_source' => $request->known_from,
             ];
             $auth = AuthModel::create($data_param);
             if ($auth) {
+                $param = [
+                    'customer_id' => $auth->id,
+                    'service_id' => random_int(1000000000000000, 9999999999999999),
+                    'service_name' => 'email',
+                ];
+                CustomerSocialModel::create($param);
+
                 // $this->whatsappNotification($auth->phone, $auth->name);
                 // $auth->notify(new WelcomeEmailNotification($auth));
                 $token = $auth->createToken('verify_token', ['*'], now()->addMinutes(10))->plainTextToken;
@@ -104,6 +122,7 @@ class AuthController extends Controller
                     'customer_id' => $auth->id, 
                     'name' => 'verify_token',
                     'token' => $token_verify,
+                    'expires_at' => now()->addMinutes(10),
                 ]);
 
                 Mail::to($request->email)->send(new VerifyEmail($request->name, $url_verify));
@@ -205,7 +224,16 @@ class AuthController extends Controller
                     'id' => $data->id,
                     'name' => $data->name,
                     'email' => $data->email,
+                    'phone_code' => $data->phone_code,
+                    'phone_dial_code' => $data->phone_dial_code,
+                    'phone_domestic' => $data->phone_domestic,
+                    'phone_iso2' => $data->phone_iso2,
                     'phone' => $data->phone,
+                    'address' => $data->address,
+                    'province_id' => $data->province_id,
+                    'city_id' => $data->city_id,
+                    'district_id' => $data->district_id,
+                    'subdistrict_id' => $data->subdistrict_id,
                     'photo' => !empty($data->photo) ? asset('storage/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext) : '',
                     'avatar' => !empty($data->avatar) ? $data->avatar : '',
                     'is_verified' => $data->is_active,
@@ -221,32 +249,20 @@ class AuthController extends Controller
     }
 
 
-    function update_profile(Request $request, $id)
+    function update_profile(Request $request)
     {
         $data = Auth::user();
         $validator = Validator::make($request->all(),[
             'name' => 'required|string|max:255',
-            'password' => 'string|min:8',
             'phone_number' => 'required|min:10|max:13',
-            'photo' => File::image()->max(2024),
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
-        $photo = $request->file('photo');
-        $file_ext = '';
-        $file_path = '';
-        if ($photo) {
-            Storage::delete('public/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext);
-            $file_ext = $photo->getClientOriginalExtension();
-            $file_name = 'ava-'.time().'-'.sha1($request->name.$request->phone_number);
-            $file_path = $photo->storeAs('images/customers', $file_name.'.'.$photo->getClientOriginalExtension(), 'public');
-        }
-
-        if ($file_path !== '') {
-            $file_name = base64_encode($file_name);
+            return response()->json([
+                'code' => 200,
+                'status' => false,
+                'data' => $validator->errors(),
+            ], 200);
         }
 
         $phone_number = $request->phone_number;
@@ -255,32 +271,42 @@ class AuthController extends Controller
         }
 
         if ($phone_number[0] === "8") {
-            $phone_number = "62" . $phone_number;
-        }
-
-        if ($file_path !== '') {
-            $file_name = base64_encode($file_name);
+            // $phone_number = "62" . $phone_number;
+            $phone_number = $phone_number;
         }
 
         $data_param = [
             'name' => $request->name,
             'phone_code' => $request->phone_code,
             'phone_dial_code' => $request->phone_dial_code,
+            'phone_domestic' => $request->phone_domestic,
+            'phone_iso2' => $request->phone_iso2,
             'phone' => $phone_number,
-            'photo' => $file_path ? $file_name : $data->photo,
-            'photo_ext' => $file_path ? $file_ext : $data->photo_ext,
+            'address' => $request->address,
+            'province_id' => $request->province,
+            'city_id' => $request->city,
+            'district_id' => $request->district,
+            'subdistrict_id' => $request->subdistrict,
         ];
 
-        $data = AuthModel::where('id', $id)->update($data_param);
+        $data = AuthModel::where('id', $data->id)->update($data_param);
         if ($data) {
             return response()->json([
                 'code' => 200,
                 'status' => true,
                 'message' => 'Success change data profile',
                 'data' => [
-                    'id' => $id,
-                    'name' => $data_param['name'],
-                    'photo' => asset('storage/images/customers/'.base64_decode($data_param['photo']).'.'.$data_param['photo_ext']),
+                    'name' => $request->name,
+                    'phone_code' => $request->phone_code,
+                    'phone_dial_code' => $request->phone_dial_code,
+                    'phone_domestic' => $request->phone_domestic,
+                    'phone_iso2' => $request->phone_iso2,
+                    'phone' => $phone_number,
+                    'address' => $request->address,
+                    'province_id' => $request->province,
+                    'city_id' => $request->city,
+                    'district_id' => $request->district,
+                    'subdistrict_id' => $request->subdistrict,
                 ],
             ], 200);
         } else {
@@ -289,6 +315,46 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Failed change data profile',
             ], 400);
+        }
+    }
+
+    function update_avatar(Request $request)
+    {
+        $data = Auth::user();
+        Storage::delete('public/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext);
+        $path = public_path('storage/images/customers/');
+        !is_dir($path) &&
+            mkdir($path, 0777, true);
+
+        $image_parts      = explode(";base64,", $request->photo);
+        $image_type_aux   = explode("image/", $image_parts[0]);
+        $image_type       = $image_type_aux[1];
+        $image_base64     = base64_decode($image_parts[1]);
+        $image_name       = base64_encode('ava-'.time().'-'.sha1($data->name));
+        $image_full_path  = $path . base64_decode($image_name) . '.png';
+        file_put_contents($image_full_path, $image_base64);
+
+        $data_param = [
+            'photo' => $image_name,
+            'photo_ext' => $image_type,
+        ];
+
+        $data = AuthModel::where('id', $request->id)->update($data_param);
+        if ($data) {
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'message' => 'Success change your avatar',
+                'data' => [
+                    'photo' => asset('storage/images/customers/'.base64_decode($data_param['photo']).'.'.$data_param['photo_ext']),
+                ]
+            ], 200);
+        } else {
+            return response()->json([
+                'code' => 400,
+                'status' => false,
+                'message' => 'Failed change your avatar',
+            ], 200);
         }
     }
 
@@ -309,6 +375,7 @@ class AuthController extends Controller
         $ref = $request->ref;
         $signature = $request->signature;
         $valid_signature = sha1($id . $request->hash);
+        $verify_user = CustomerVerifyModel::where('token', $hash)->where('customer_id', $id)->first();
         if ($ref == 'account_registration') {
             if ($valid_signature !== $signature) {
                 return response()->json([
@@ -325,9 +392,16 @@ class AuthController extends Controller
                     'message' => 'Invalid/expired url provided.',
                 ], 200);
             }
-    
-            $verify_user = CustomerVerifyModel::where('token', $hash)->where('customer_id', $id)->first();
+            
             if (!is_null($verify_user)) {
+                if ($verify_user->expires_at != null && (strtotime($verify_user->expires_at) < strtotime(now())) ) {
+                    return response()->json([
+                        'code' => 400,
+                        'status' => false,
+                        'message' => 'Invalid/expired url provided.',
+                    ], 200);
+                }
+
                 $user = AuthModel::where('id', $id)->first();
                 if (!$user->email_verified_at && ($user->is_active == 0)) {
                     AuthModel::where('id', $id)->where('email_verified_at', NULL)->update(['email_verified_at' => now(), 'is_active' => 1]);
@@ -336,14 +410,14 @@ class AuthController extends Controller
                         'status' => true,
                         'message' => 'Your email is verified. You can now login.',
                     ];
-                    return redirect()->away($this->domain.'auth/login');
+                    return redirect()->away(env('APP_URL_FRONTEND') . '/auth/login');
                 } else {
                     $response = [
                         'code' => 200,
                         'status' => false,
                         'message' => 'Your email is already verified. You can now login.',
                     ];
-                    return redirect()->away($this->domain.'auth/login');
+                    return redirect()->away(env('APP_URL_FRONTEND') . '/auth/login');
                 }
             } else {
                 $response = [
@@ -374,6 +448,7 @@ class AuthController extends Controller
                     'customer_id' => $request->id['id'],
                     'name' => 'verify_token',
                     'token' => $token_verify,
+                    'expires_at' => now()->addMinutes(10),
                 ]);
                 Mail::to($request->id['email'])->send(new VerifyEmail($request->id['name'], $url_verify));
     

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserGroupSeeder::class,
             UserSeeder::class,
             PrivilegeMenusSeeder::class,
+            InvitationCategories::class,
         ]);
     }
 }

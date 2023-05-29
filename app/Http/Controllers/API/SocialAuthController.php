@@ -7,6 +7,7 @@ use App\Models\API\CustomerSocialModel;
 use App\Models\AuthModel;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
@@ -48,9 +49,19 @@ class SocialAuthController extends Controller
                 'phone_dial_code' => '',
                 'phone' => '',
                 'avatar' => $serviceUser->getAvatar(),
+                'known_source'=> $service,
                 'is_active' => 1,
             ];
             $user = AuthModel::create($param);
+        } else {
+            $param['avatar'] = $serviceUser->getAvatar();
+
+            if ($user->is_active === 0 && $user->email_verified_at === null) {
+                $param['email_verified_at'] = now();
+                $param['is_active'] = 1;
+            }
+
+            AuthModel::where('id', $user->id)->update($param);
         }
 
         if ($this->needToCreateSocial($user, $service)) {
@@ -62,9 +73,8 @@ class SocialAuthController extends Controller
             CustomerSocialModel::create($param);
         }
 
-        $token = $user->createToken('login_token', ['*'], now()->addHours(5))->plainTextToken;
-        // return redirect(env('APP_URL_FRONTEND') . '/auth/social-callback?token=' . $token . '&origin=' . ($newUser ? 'register' : 'login'));
-        return redirect('http://192.168.0.221:3000/auth/social-callback?token=' . $token . '&origin=' . ($newUser ? 'register' : 'login'));
+        $token = $user->createToken(($newUser ? 'register_token' : 'login_token'), ['*'], now()->addHours(5))->plainTextToken;
+        return redirect(env('APP_URL_FRONTEND') . '/auth/social-callback?token=' . $token . '&origin=' . ($newUser ? 'register' : 'login') . '&name=' . $user->name);
     }
 
     function needToCreateSocial(AuthModel $user, $service)

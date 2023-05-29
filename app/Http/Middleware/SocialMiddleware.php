@@ -9,13 +9,15 @@ class SocialMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $services = ['facebook','twitter','linkedin','google','github','gitlab','bitbucket'];
+        $services = ['facebook', 'twitter', 'linkedin', 'google', 'github', 'gitlab', 'bitbucket'];
         $enabledServices = [];
         foreach ($services as $service) {
-            if (config('services'.$service)) {
+            if (config('services' . $service)) {
                 $enabledServices[] = $service;
             }
         }
+
+        dd($enabledServices);
 
         if (!in_array(strtolower($request->service), $enabledServices)) {
             if ($request->expectsJson()) {
