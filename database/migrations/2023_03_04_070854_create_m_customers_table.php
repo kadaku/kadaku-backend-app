@@ -21,11 +21,11 @@ return new class extends Migration
             $table->string('email')->unique('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('phone_code', 5);
-            $table->string('phone_dial_code', 10);
-            $table->string('phone_domestic', 60);
-            $table->string('phone_iso2', 5);
-            $table->string('phone', 20);
+            $table->string('phone_code', 5)->nullable();;
+            $table->string('phone_dial_code', 10)->nullable();;
+            $table->string('phone_domestic', 60)->nullable();
+            $table->string('phone_iso2', 5)->nullable();;
+            $table->string('phone', 20)->nullable();;
             $table->text('address')->nullable();
             $table->integer('province_id')->nullable();
             $table->integer('city_id')->nullable();
@@ -37,6 +37,23 @@ return new class extends Migration
             $table->binary('avatar')->nullable();
             $table->tinyInteger('is_active')->default(0);
             $table->string('known_source', 50)->nullable();
+
+            // update field
+            $table->bigInteger('referral_id')->nullable()->comment('id customer recommendation');
+            $table->tinyInteger('is_trial')->default(1);
+            $table->tinyInteger('is_premium')->default(0);
+            $table->tinyInteger('is_reseller')->default(0);
+            $table->string('reseller_name', 100)->nullable();
+            $table->text('reseller_bio')->nullable();
+            $table->binary('reseller_logo')->nullable();
+            $table->double('saldo')->default(0);
+            $table->double('total_withdrawal')->default(0);
+            $table->tinyInteger('is_subscription')->default(1);
+
+            $table->dateTime('start_at');
+            $table->dateTime('expired_at');
+
+
             $table->rememberToken();
             $table->timestamps();
         });

@@ -18,7 +18,11 @@ class DatabaseSeeder extends Seeder
             UserGroupSeeder::class,
             UserSeeder::class,
             PrivilegeMenusSeeder::class,
-            InvitationCategories::class,
+            InvitationCategoriesSeeder::class,
+            ThemesTypeSeeder::class,
+            ThemesSeeder::class,
+            PackageSeeder::class,
+            AddonsSeeder::class,
         ]);
     }
 }

@@ -30,9 +30,11 @@ return new class extends Migration
             $table->string('logo_light_ext', 5)->nullable();
             $table->binary('favicon')->nullable();
             $table->string('favicon_ext', 5)->nullable();
+            $table->string('facebook')->nullable();
             $table->string('youtube')->nullable();
             $table->string('instagram')->nullable();
-            $table->string('facebook')->nullable();
+            $table->string('twitter')->nullable();
+            $table->string('tiktok')->nullable();
             $table->string('twitter')->nullable();
             $table->timestamps();
         });

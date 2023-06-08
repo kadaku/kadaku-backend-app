@@ -3,9 +3,12 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\CategoriesController;
+use App\Http\Controllers\API\CouponsController;
 use App\Http\Controllers\API\InvitationsController;
+use App\Http\Controllers\API\MasterdataController;
 use App\Http\Controllers\API\RegionsController;
 use App\Http\Controllers\API\SocialAuthController;
+use App\Http\Controllers\API\ThemesController;
 use App\Http\Controllers\API\XenditController;
 use App\Http\Controllers\ResetPassword;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +31,7 @@ Route::middleware(['api_key'])->group(function () {
     // rute-rute yang memerlukan autentikasi API key
     Route::get('/brand', [BrandController::class, 'index']);
     Route::get('/categories', [CategoriesController::class, 'list']);
+    Route::get('/invitations/domain/{slug}', [InvitationsController::class, 'get_by_domain']);
     Route::controller(RegionsController::class)->group(function () {
         Route::get('/regions/province', 'propinsi');
         Route::get('/regions/province/{no}', 'propinsi');
@@ -50,6 +54,18 @@ Route::middleware(['api_key'])->group(function () {
         Route::post('/reset-password/validate-token', 'validate_token');
         Route::post('/reset-password/change', 'change');
     });
+    
+    Route::controller(ThemesController::class)->group(function () {
+        Route::get('/themes', 'list');
+        Route::post('/theme', 'getTheme');
+        Route::put('/theme/component/update', 'updateComponent');
+    });
+
+});
+
+Route::controller(MasterdataController::class)->group(function () {
+    Route::get('/packages', 'list_packages');
+    Route::get('/addons', 'list_addons');
 });
 
 Route::get('email/verify/{id}', [AuthController::class, 'verify'])->name('user.verify'); 
@@ -66,6 +82,9 @@ Route::controller(AuthController::class)->group(function () {
             Route::post('/avatar', 'update_avatar');
         });
 
+        // PAYMENTS
+        Route::post('/payment/xendit/invoice_checkout', [XenditController::class, 'checkoutInvoice']);
+
         Route::post('/logout', 'logout');
     });
 
@@ -74,11 +93,21 @@ Route::controller(AuthController::class)->group(function () {
     });
 });
 
-// INVITATIONS
-Route::controller(InvitationsController::class)->group(function () {    
-    Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
+    // INVITATIONS
+    Route::controller(InvitationsController::class)->group(function () {    
         Route::prefix('/invitations')->group(function () {
+            Route::get('/', 'list');
+            Route::get('/{id}', 'get');
             Route::post('/', 'create');
+        });
+    });
+    
+    // COUPONS
+    Route::controller(CouponsController::class)->group(function () {    
+        Route::prefix('/coupons')->group(function () {
+            Route::post('/apply', 'check_valid');
+            Route::get('/available', 'list');
         });
     });
 });
@@ -89,6 +118,5 @@ Route::controller(SocialAuthController::class)->group(function () {
     Route::get('/auth/login/{service}/callback', 'callback');
 });
 
-// XENDIT
-Route::post('/payment/xendit', [XenditController::class, 'payment']);
-Route::post('/payment/xendit/callback', [XenditController::class, 'payment']);
+// CALLBACKS
+Route::post('/payment/xendit/invoice_callback', [XenditController::class, 'invoiceCallback']);

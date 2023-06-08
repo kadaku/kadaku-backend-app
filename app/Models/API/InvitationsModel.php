@@ -5,13 +5,16 @@ namespace App\Models\API;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoriesModel extends Model
+class InvitationsModel extends Model
 {
     use HasFactory;
 
-    protected $table = "m_categories";
+    protected $table = "t_invitations";
   
     protected $fillable = [
-        'title', 'slug', 'icon', 'meta_title', 'meta_description', 'is_active'
+        'customer_id',
+        'category_id',
+        'theme_id',
+        'domain',
     ];
 }

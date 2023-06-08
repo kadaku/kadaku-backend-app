@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_invitation_categories', function (Blueprint $table) {
+        Schema::create('t_wishes', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_general_ci';
 
             $table->id();
+            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('invitation_id');
             $table->string('name');
-            $table->string('slug');
-            $table->string('icon')->nullable();
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
-            $table->tinyInteger('is_active')->default(0);
+            $table->longText('message');
             $table->timestamps();
+
+            // foreign key
+            $table->foreign('customer_id')->references('id')->on('m_customers')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('invitation_id')->references('id')->on('t_invitations')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_invitation_categories');
+        Schema::dropIfExists('t_wishes');
     }
 };

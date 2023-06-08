@@ -22,6 +22,8 @@ class BrandSeeder extends Seeder
             'phone_dial_code' => '62',
             'phone' => '085966622963',
             'instagram' => 'https://instagram.com/kadaku.id',
+            'facebook' => 'https://www.facebook.com/kadaku.id',
+            'tiktok' => 'https://www.tiktok.com/@kadaku.id',
             'created_at' => date('Y-m-d H:i:s')
         ]);
     }
