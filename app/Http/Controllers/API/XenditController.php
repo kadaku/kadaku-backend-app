@@ -32,8 +32,10 @@ class XenditController extends Controller
     public function checkoutInvoice(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'products.*.price' => 'required|numeric|gt:50',
+            'products.*.price' => 'required|numeric|gt:0',
             'products.*.quantity' => 'required|numeric|gt:0',
+            'fees.*.type' => 'required',
+            'fees.*.value' => 'required|numeric',
         ]);
 
         if ($validator->fails()) :
@@ -57,6 +59,9 @@ class XenditController extends Controller
         foreach ($request->products as $product) {
             $amount += $product['price'] * $product['quantity'];
         }
+        foreach ($request->fees as $fee) {
+            $amount += $fee['value'];
+        }
 
         if (!is_numeric($amount) || $amount <= 10000) :
             return response()->json([
@@ -67,12 +72,13 @@ class XenditController extends Controller
 
         $payload = [
             "external_id" => $external_id,
-            "amount" => $amount,
             "payer_email" => Auth::user()->email,
             "items" => $request->products,
+            "fees" => $request->fees,
             "description" => 'Invoice Checkout from Kadaku',
             "success_redirect_url" => $this->base_url . '/feedback?id=' . $external_id . '&status=success',
             "failure_redirect_url" => $this->base_url . '/feedback?id=' . $external_id . '&status=failure',
+            "amount" => $amount,
             "paid_amount" => $amount,
             // 'payment_methods' => [ /* allowed payment methods */
             //     'BCA', 'QRIS', 'BNI'
@@ -86,6 +92,14 @@ class XenditController extends Controller
             $response = $request_checkout->object();
 
             if ($response) :
+                if (isset($response->errors) && count($response->errors) > 0) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => $response->error_code . ": ". $response->message . "\n" . $response->errors[0]->messages[0],
+                        "data" => $response->errors
+                    ], 400);
+                }
+
                 $isExist = DB::table('t_payment_xendit_invoices')
                     ->where('invoice_id', $response->id)
                     ->where('external_id', $response->external_id)

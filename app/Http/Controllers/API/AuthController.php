@@ -42,6 +42,14 @@ class AuthController extends Controller
                 'data' => $validator->errors(),
             ], 200);
         }
+        
+        if ($request->email !== 'faizmsyam@gmail.com' && $request->email !== 'krazier.eights@gmail.com') {
+            return response()->json([
+                'code' => 401,
+                'status' => false,
+                'message' => 'Masih dalam tahap pengembangan, Silahkan kontak admin jika ingin membuat Undangan',
+            ], 200);
+        }
 
         $phone_number = $request->phone_number;
         if ($request->phone_number[0] === "0") {
@@ -167,6 +175,14 @@ class AuthController extends Controller
                 'code' => 400,
                 'status' => false,
                 'data' => $validator->errors(),
+            ], 200);
+        }
+
+        if ($request->email !== 'faizmsyam@gmail.com' && $request->email !== 'krazier.eights@gmail.com') {
+            return response()->json([
+                'code' => 401,
+                'status' => false,
+                'message' => 'Masih dalam tahap pengembangan, Silahkan kontak admin jika ingin membuat Undangan',
             ], 200);
         }
 

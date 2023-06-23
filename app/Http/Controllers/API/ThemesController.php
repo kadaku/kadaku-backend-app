@@ -103,27 +103,29 @@ class ThemesController extends Controller
         ->first();
 
         if ($theme) :
-            $components = DB::table('t_theme_components')
+            $components = DB::table('m_theme_components')
             ->select([
-                't_theme_components.*',
-                DB::raw('(ROW_NUMBER() OVER ( PARTITION BY t_theme_components.name ORDER BY t_theme_components.id )) AS row_num')
+                'm_theme_components.*',
+                DB::raw('(ROW_NUMBER() OVER ( PARTITION BY m_theme_components.name ORDER BY m_theme_components.id )) AS row_num')
             ])
-            ->where('t_theme_components.theme_id', $theme->theme_id)
-            ->where('t_theme_components.is_active', 1)
-            ->orderBy('t_theme_components.order', 'asc')
+            ->where('m_theme_components.theme_id', $theme->theme_id)
+            ->where('m_theme_components.invitation_id', 0)
+            ->where('m_theme_components.customer_id', 0)
+            ->where('m_theme_components.is_active', 1)
+            ->orderBy('m_theme_components.order', 'asc')
             ->get();
 
             $theme->components = $components;
             
             return response()->json([
                 "status" => true,
-                "message" => 'The theme data was found',
+                "message" => 'The master theme components data was found',
                 "data" => $theme
             ]);
         endif;
         return response()->json([
             "status" => false,
-            "message" => 'The theme data was not found'
+            "message" => 'The master theme components data was not found'
         ], 404);
     }
 
@@ -131,8 +133,8 @@ class ThemesController extends Controller
 
         $value = $request->field == "props" ? json_encode($request->value) : $request->value;
 
-        $newTheme = DB::table('t_theme_components')
-        ->where('theme_id', $request->parent_id)
+        $newTheme = DB::table('m_theme_components')
+        ->where('theme_id', $request->theme_id)
         ->where('name', $request->name)
         ->where('ref', $request->ref)
         ->update([

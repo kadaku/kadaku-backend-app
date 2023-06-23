@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('domain', 100);
             $table->binary('cover')->comment('for picture in SEO')->nullable();
             $table->string('heading', 100)->comment('for title in SEO')->nullable();
-            $table->string('introduction', 100)->comment('for description in SEO')->nullable();
+            $table->text('introduction')->comment('for description in SEO')->nullable();
             
             // event
             $table->date('first_event_date')->nullable();

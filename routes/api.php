@@ -32,6 +32,8 @@ Route::middleware(['api_key'])->group(function () {
     Route::get('/brand', [BrandController::class, 'index']);
     Route::get('/categories', [CategoriesController::class, 'list']);
     Route::get('/invitations/domain/{slug}', [InvitationsController::class, 'get_by_domain']);
+    Route::post('/invitations/wish', [InvitationsController::class, 'store_wish_by_domain']);
+    Route::get('/invitations/wishes/domain/{slug}/{invitation_id}/{per_fetch}/{current_total}', [InvitationsController::class, 'get_wishes_by_domain']);
     Route::controller(RegionsController::class)->group(function () {
         Route::get('/regions/province', 'propinsi');
         Route::get('/regions/province/{no}', 'propinsi');
@@ -100,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', 'list');
             Route::get('/{id}', 'get');
             Route::post('/', 'create');
+            Route::put('/', 'update');
         });
     });
     
