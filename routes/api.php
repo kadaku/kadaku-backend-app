@@ -75,7 +75,6 @@ Route::get('email/verify/{id}', [AuthController::class, 'verify'])->name('user.v
 Route::controller(AuthController::class)->group(function () {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
-
     
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('/user')->group(function () {
@@ -83,9 +82,6 @@ Route::controller(AuthController::class)->group(function () {
             Route::put('/', 'update_profile');
             Route::post('/avatar', 'update_avatar');
         });
-
-        // PAYMENTS
-        Route::post('/payment/xendit/invoice_checkout', [XenditController::class, 'checkoutInvoice']);
 
         Route::post('/logout', 'logout');
     });
@@ -96,13 +92,30 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    // INVITATIONS
-    Route::controller(InvitationsController::class)->group(function () {    
-        Route::prefix('/invitations')->group(function () {
-            Route::get('/', 'list');
-            Route::get('/{id}', 'get');
-            Route::post('/', 'create');
-            Route::put('/', 'update');
+    // PAYMENTS
+    Route::controller(XenditController::class)->group(function () {
+        Route::prefix('/payment')->group(function () {
+            Route::prefix('/xendit')->group(function () {
+                Route::prefix('/invoice_checkout')->group(function () {
+                    Route::post('/premium_account_activation', 'checkout_invoice_premium_account_activation');
+                });
+            });
+        });
+    });
+
+    Route::middleware(['ensure.premium.account'])->group(function () {
+        // INVITATIONS
+        Route::controller(InvitationsController::class)->group(function () {    
+            Route::prefix('/invitations')->group(function () {
+                Route::post('/check_available_domain', 'check_available_domain')->withoutMiddleware(['ensure.premium.account']);
+                Route::get('/', 'list')->withoutMiddleware(['ensure.premium.account']);
+                Route::get('/{id}', 'get');
+                Route::get('/{id}/all', 'get_all');
+                Route::post('/', 'create');
+                Route::put('/', 'update');
+                Route::post('/store/image', 'store_image');
+                Route::post('/destroy/image', 'destroy_image');
+            });
         });
     });
     
@@ -121,5 +134,13 @@ Route::controller(SocialAuthController::class)->group(function () {
     Route::get('/auth/login/{service}/callback', 'callback');
 });
 
-// CALLBACKS
-Route::post('/payment/xendit/invoice_callback', [XenditController::class, 'invoiceCallback']);
+// PUBLIC CALLBACKS
+Route::controller(XenditController::class)->group(function () {
+    Route::prefix('/payment')->group(function () {
+        Route::prefix('/xendit')->group(function () {
+            Route::prefix('/invoice_callback')->group(function () {
+                Route::post('/premium_account_activation', 'invoice_callback');
+            });
+        });
+    });
+});

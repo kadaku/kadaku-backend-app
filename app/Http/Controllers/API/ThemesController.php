@@ -106,7 +106,7 @@ class ThemesController extends Controller
             $components = DB::table('m_theme_components')
             ->select([
                 'm_theme_components.*',
-                DB::raw('(ROW_NUMBER() OVER ( PARTITION BY m_theme_components.name ORDER BY m_theme_components.id )) AS row_num')
+                DB::raw('(ROW_NUMBER() OVER ( PARTITION BY m_theme_components.name ORDER BY m_theme_components.order )) AS row_num')
             ])
             ->where('m_theme_components.theme_id', $theme->theme_id)
             ->where('m_theme_components.invitation_id', 0)

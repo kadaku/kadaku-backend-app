@@ -43,13 +43,13 @@ class AuthController extends Controller
             ], 200);
         }
         
-        if ($request->email !== 'faizmsyam@gmail.com' && $request->email !== 'krazier.eights@gmail.com') {
-            return response()->json([
-                'code' => 401,
-                'status' => false,
-                'message' => 'Masih dalam tahap pengembangan, Silahkan kontak admin jika ingin membuat Undangan',
-            ], 200);
-        }
+        // if ($request->email !== 'faizmsyam@gmail.com' && $request->email !== 'krazier.eights@gmail.com') {
+        //     return response()->json([
+        //         'code' => 401,
+        //         'status' => false,
+        //         'message' => 'Masih dalam tahap pengembangan, Silahkan kontak admin jika ingin membuat Undangan',
+        //     ], 200);
+        // }
 
         $phone_number = $request->phone_number;
         if ($request->phone_number[0] === "0") {
@@ -178,13 +178,13 @@ class AuthController extends Controller
             ], 200);
         }
 
-        if ($request->email !== 'faizmsyam@gmail.com' && $request->email !== 'krazier.eights@gmail.com') {
-            return response()->json([
-                'code' => 401,
-                'status' => false,
-                'message' => 'Masih dalam tahap pengembangan, Silahkan kontak admin jika ingin membuat Undangan',
-            ], 200);
-        }
+        // if ($request->email !== 'faizmsyam@gmail.com' && $request->email !== 'krazier.eights@gmail.com' && $request->email !== 'iisandesign@gmail.com') {
+        //     return response()->json([
+        //         'code' => 401,
+        //         'status' => false,
+        //         'message' => 'Masih dalam tahap pengembangan, Silahkan kontak admin jika ingin membuat Undangan',
+        //     ], 200);
+        // }
 
         if (!Auth::guard('api')->attempt($request->only('email', 'password')))
         {
@@ -197,7 +197,10 @@ class AuthController extends Controller
 
         $auth = AuthModel::where('email', $request->email)->where('is_active', 1)->where('email_verified_at', '!=', NULL)->first();
         if ($auth) {
-            $token = $auth->createToken('login_token', ['*'], now()->addHours(5))->plainTextToken;
+            $token = $auth->createToken(
+                'login_token', ['*'], 
+                $request->remember_me == 'true' ? now()->addYear(1) : now()->addHours(5)
+            )->plainTextToken;
             return response()->json([
                 'code' => 200,
                 'status' => true,
@@ -228,7 +231,7 @@ class AuthController extends Controller
         }
     }
 
-    function profile()
+    function profile(Request $request)
     {
         $data = Auth::user();
         if ($data) {
@@ -250,9 +253,23 @@ class AuthController extends Controller
                     'city_id' => $data->city_id,
                     'district_id' => $data->district_id,
                     'subdistrict_id' => $data->subdistrict_id,
+                    'post_code' => $data->post_code,
                     'photo' => !empty($data->photo) ? asset('storage/images/customers/'.base64_decode($data->photo).'.'.$data->photo_ext) : '',
                     'avatar' => !empty($data->avatar) ? $data->avatar : '',
                     'is_verified' => $data->is_active,
+                    'known_source' => $data->known_source,
+                    'referral_id' => $data->referral_id,
+                    'is_trial' => $data->is_trial,
+                    'is_premium' => $data->is_premium,
+                    'is_reseller' => $data->is_reseller,
+                    'reseller_name' => $data->reseller_name,
+                    'reseller_bio' => $data->reseller_bio,
+                    'reseller_logo' => $data->reseller_logo,
+                    'saldo' => $data->saldo,
+                    'total_withdrawal' => $data->total_withdrawal,
+                    'is_subscription' => $data->is_subscription,
+                    'start_at' => $data->start_at,
+                    'expired_at' => $data->expired_at
                 ]
             ], 200);
         } else {
