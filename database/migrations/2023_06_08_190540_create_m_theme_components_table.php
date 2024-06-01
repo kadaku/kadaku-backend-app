@@ -30,6 +30,8 @@ return new class extends Migration
             $table->binary('thumbnail')->nullable();
             $table->tinyInteger('is_premium')->default(0);
             $table->tinyInteger('is_active')->default(1);
+            $table->tinyInteger('is_fixed')->default(0);
+            $table->tinyInteger('is_always_on')->default(0);
             $table->timestamps();
         });
     }

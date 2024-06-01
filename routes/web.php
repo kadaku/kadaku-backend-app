@@ -16,64 +16,63 @@ use Illuminate\Support\Facades\URL;
 |
 */
 
-Route::group(['namespace' => 'App\Http\Controllers'], function()
-{   
-    Route::group(['middleware' => ['guest']], function() {
-        /**
-         * Login Routes
-         */
-        Route::get('/login', 'LoginController@show')->name('login.show');
-        Route::post('/login', 'LoginController@login')->name('login.perform');
+Route::group(['namespace' => 'App\Http\Controllers'], function () {
+	Route::group(['middleware' => ['guest']], function () {
+		/**
+		 * Login Routes
+		 */
+		Route::get('/login', 'LoginController@show')->name('login.show');
+		Route::post('/login', 'LoginController@login')->name('login.perform');
 
-        Route::get('/', function () {
-            return view('home.index');
-        });
-    });
+		Route::get('/', function () {
+			return view('home.index');
+		});
+	});
 
-    Route::group(['middleware' => ['admin']], function() {
-        /**
-         * Logout Routes
-         */
-        Route::get('/logout', 'LogoutController@perform')->name('logout.perform');
+	Route::group(['middleware' => ['admin']], function () {
+		/**
+		 * Logout Routes
+		 */
+		Route::get('/logout', 'LogoutController@perform')->name('logout.perform');
 
-        /**
-         * Dashboard Routes
-         */
-        Route::get('/dashboard', 'DashboardController@index')->name('dashboard.index');
+		/**
+		 * Dashboard Routes
+		 */
+		Route::get('/dashboard', 'DashboardController@index')->name('dashboard.index');
 
 
-        /** 
-         * Brand
-        */
-        Route::get('/brand', 'BrandController@index');
-        Route::get('/brand/show/{id}', 'BrandController@show');
-        Route::post('/brand/store', 'BrandController@store');
+		/** 
+		 * Brand
+		 */
+		Route::get('/brand', 'BrandController@index');
+		Route::get('/brand/show/{id}', 'BrandController@show');
+		Route::post('/brand/store', 'BrandController@store');
 
-        /** 
-         * Admin Menu
-        */
-        Route::get('/admin-menu', 'AdminMenuController@index');
-        Route::get('/admin-menu/list', 'AdminMenuController@list');
-        Route::post('/admin-menu/store', 'AdminMenuController@store');
-        Route::get('/admin-menu/show/{id}', 'AdminMenuController@show');
-        Route::delete('/admin-menu/destroy/{id}', 'AdminMenuController@destroy');
+		/** 
+		 * Admin Menu
+		 */
+		Route::get('/admin-menu', 'AdminMenuController@index');
+		Route::get('/admin-menu/list', 'AdminMenuController@list');
+		Route::post('/admin-menu/store', 'AdminMenuController@store');
+		Route::get('/admin-menu/show/{id}', 'AdminMenuController@show');
+		Route::delete('/admin-menu/destroy/{id}', 'AdminMenuController@destroy');
 
-        /** 
-         * User Group & Privileges
-        */
-        Route::get('/privileges', 'PrivilegesController@index');
-        Route::get('/privileges/list', 'PrivilegesController@list');
-        Route::get('/privileges/list-privileges', 'PrivilegesController@list_privileges');
-        Route::get('/privileges/show/{id}', 'PrivilegesController@show');
-        Route::post('/privileges/store', 'PrivilegesController@store');
-        Route::delete('/privileges/destroy/{id}', 'PrivilegesController@destroy');
+		/** 
+		 * User Group & Privileges
+		 */
+		Route::get('/privileges', 'PrivilegesController@index');
+		Route::get('/privileges/list', 'PrivilegesController@list');
+		Route::get('/privileges/list-privileges', 'PrivilegesController@list_privileges');
+		Route::get('/privileges/show/{id}', 'PrivilegesController@show');
+		Route::post('/privileges/store', 'PrivilegesController@store');
+		Route::delete('/privileges/destroy/{id}', 'PrivilegesController@destroy');
 
-        /** 
-         * Accounts
-        */
-        Route::get('/accounts', 'AccountsController@index');
-        Route::get('/accounts/list', 'AccountsController@list');
-        Route::get('/accounts/show/{id}', 'AccountsController@show');
-        Route::post('/accounts/update-status', 'AccountsController@update');
-    });
+		/** 
+		 * Accounts
+		 */
+		Route::get('/accounts', 'AccountsController@index');
+		Route::get('/accounts/list', 'AccountsController@list');
+		Route::get('/accounts/show/{id}', 'AccountsController@show');
+		Route::post('/accounts/update-status', 'AccountsController@update');
+	});
 });

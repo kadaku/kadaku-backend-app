@@ -15,6 +15,7 @@ class ThemesController extends Controller
         $data->leftJoin('m_categories as c', 'c.id', '=', 't.category_id');
         $data->leftJoin('m_themes_type as tt', 'tt.id', '=', 't.type_id');
         $data->where('t.is_active', 1);
+        $data->orderByDesc('t.id');
 
         if (isset($request->category_id) && !empty($request->category_id)) {
             $data->where('t.category_id', $request->category_id);
