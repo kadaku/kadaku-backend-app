@@ -2,6 +2,7 @@
 <html lang="en" 
     data-layout="vertical" 
     data-layout-style="detached" 
+    {{-- data-layout-style="default"  --}}
     data-sidebar="dark" 
     data-topbar="dark"
     data-sidebar-size="lg" 
@@ -29,14 +30,14 @@
     <link rel="icon" type="image/png" href="{{ asset('storage/images/brand/'.base64_decode(brand()->favicon).'.'.brand()->favicon_ext) }}" sizes="32x32">
     <link rel="icon" type="image/png" href="{{ asset('storage/images/brand/'.base64_decode(brand()->favicon).'.'.brand()->favicon_ext) }}" sizes="16x16">
 
-
     <link href="{{ asset('main/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('main/css/icons.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('main/css/app.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('main/css/custom.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('extend/css/fancybox.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('extend/css/syam.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('extend/css/fancybox.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('extend/plugins/toastr/toastr.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('extend/plugins/fontawesome-6.5.2-web/css/all.min.css') }}" rel="stylesheet" type="text/css">
 
     <script src="{{ asset('main/js/jquery-3.6.3.min.js') }}"></script>
     <script src="{{ asset('main/js/layout.js') }}"></script>
@@ -55,6 +56,7 @@
     <script src="{{ asset('extend/js/fancybox.js') }}"></script>
     <script src="{{ asset('extend/js/syam.min.js') }}"></script>
     <script src="{{ asset('extend/plugins/toastr/toastr.min.js') }}"></script>
+
 </head>
 
 <body>

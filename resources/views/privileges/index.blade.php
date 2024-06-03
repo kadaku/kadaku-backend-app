@@ -6,8 +6,8 @@
 	<div class="card-header">
 		<div class="row">
 			<div class="col-md-6">
-				<button type="button" id="btn_add" class="btn btn-primary btn-block btn-sm me-1"><i class="bx bx-plus-circle"></i> Add Data</button>
-				<button type="button" id="btn_reload" class="btn btn-secondary btn-block btn-sm"><i class="bx bx-sync"></i> Refresh Data</button>
+				<button type="button" id="btn_add" class="btn btn-primary btn-label btn-block btn-sm"><i class="fas fa-plus label-icon align-middle fs-16 me-2"></i>Add Data</button>
+				<button type="button" id="btn_reload" class="btn btn-secondary btn-label btn-block btn-sm"><i class="fas fa-sync label-icon align-middle fs-16 me-2"></i>Refresh Data</button>
 			</div>
 			<div class="col-md-6">
 				<div class="custom-search">
@@ -20,13 +20,12 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="table-responsive">
-					<table id="table_list" class="table table-striped table-hover">
-						<thead class="table-light">
+					<table id="table_list" class="table table-striped table-hover table-sm">
+						<thead>
 							<tr>
 								<th class="center" width="5%">No.</th>
 								<th class="center" width="10%">ID</th>
-								<th class="center" width="25%">Date & Time</th>
-								<th width="65%">Name Group</th>
+								<th width="80%">Name Group</th>
 								<th widht="5%"></th>
 							</tr>
 						</thead>
@@ -66,8 +65,8 @@
 					<div id="privileges_area"></div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bx bx-x-circle"></i> Cancel</button>
-					<button type="submit" class="btn btn-primary btn-sm"><i class="bx bx-save"></i> Save</button>
+					<button type="button" class="btn btn-secondary btn-label" data-bs-dismiss="modal"><i class="fas fa-circle-xmark label-icon align-middle fs-16 me-2"></i>Cancel</button>
+					<button type="submit" class="btn btn-primary btn-label"><i class="fas fa-save label-icon align-middle fs-16 me-2"></i>Save</button>
 				</div>
 			</form>
 		</div>
@@ -112,8 +111,8 @@
 				showCancelButton: true,
 				confirmButtonColor: '#FF6E31',
 				cancelButtonColor: '#6c757d',
-				cancelButtonText: '<i class="bx bx-x-circle"></i> Cancel',
-				confirmButtonText: '<i class="bx bx-paper-plane"></i> Yes',
+				cancelButtonText: '<i class="fas fa-circle-xmark me-2"></i>Cancel',
+				confirmButtonText: '<i class="fas fa-paper-plane me-2"></i>Yes',
 				allowOutsideClick: false,
 				reverseButtons: true,
 			}).then((result) => {
@@ -196,11 +195,10 @@
 					var html = '<tr>' +
 						'<td class="center">' + no + '</td>' +
 						'<td class="center">' + v.id + '</td>' +
-						'<td class="center">' + dateTimeIndoNew(v.created_at) + '</td>' +
 						'<td>' + v.name + '</td>' +
 						'<td class="right nowrap">' +
-						'<button type="button" class="btn btn-success btn-sm" onclick="editData(' + v.id + ', ' + data.data.page + ')"><i class="bx bx-edit"></i></button> ' +
-						'<button type="button" class="btn btn-danger btn-sm" onclick="deleteData(' + v.id + ', ' + data.data.page + ')"><i class="bx bx-trash"></i></button>' +
+							'<button type="button" class="btn btn-success btn-label btn-sm" onclick="editData(' + v.id + ', ' + page + ')" title="Click for update data"><i class="fas fa-edit label-icon align-middle fs-14 me-2"></i>Edit</button> ' +
+							'<button type="button" class="btn btn-danger btn-label btn-sm" onclick="deleteData(' + v.id + ', ' + page + ')" title="Click for delete data"><i class="fas fa-trash-alt label-icon align-middle fs-14 me-2"></i>Delete</button> ' +
 						'</td>' +
 						'</tr>';
 
@@ -266,8 +264,8 @@
 			showCancelButton: true,
 			confirmButtonColor: '#FF6E31',
 			cancelButtonColor: '#6c757d',
-			cancelButtonText: '<i class="bx bx-x-circle"></i> Tutup',
-			confirmButtonText: '<i class="bx bx-paper-plane"></i> Ya',
+			cancelButtonText: '<i class="fas fa-circle-xmark me-2"></i>Cancel',
+			confirmButtonText: '<i class="fas fa-paper-plane me-2"></i>Yes',
 			allowOutsideClick: false,
 			reverseButtons: true,
 		}).then((result) => {
@@ -313,13 +311,13 @@
 				var html = `
 					<div class="row mb-2">
 						<div class="col-md-12">
-							<button type="button" class="btn btn-primary btn-sm btn-block me-1" onclick="checkAll()"><i class="bx bxs-checkbox-checked"></i> Check All</button>
-							<button type="button" class="btn btn-danger btn-sm btn-block" onclick="unCheckAll()"><i class="bx bxs-checkbox"></i> Uncheck All</button>
+							<button type="button" class="btn btn-primary btn-sm btn-block btn-label" onclick="checkAll()"><i class="fas fa-square-check label-icon align-middle fs-16 me-2"></i>Check All</button>
+							<button type="button" class="btn btn-danger btn-sm btn-block btn-label" onclick="unCheckAll()"><i class="fas fa-square label-icon align-middle fs-16 me-2"></i>Uncheck All</button>
 						</div>
 					</div>
 					<div class="table-responsive">
-						<table id="table_privileges" class="table table-striped">
-							<thead class="table-light">
+						<table id="table_privileges" class="table table-striped table-sm">
+							<thead>
 								<tr>
 									<th>All Menus</th>
 								</tr>
@@ -339,7 +337,7 @@
 							list += `
 								<li class="form-check" style="padding:5px 0.5rem">
 									<input type="checkbox" name="menu_id[]" id="check_menu_${i}" onclick="checkParent(this)" value="${data.data.all_menus[i].id}" class="form-check-input check me-1">
-									<label class="form-check-label" for="check_menu_${i}"><b><i class="${data.data.all_menus[i].icon}"></i>&nbsp;&nbsp;${data.data.all_menus[i].name}</b></label>
+									<label class="form-check-label" for="check_menu_${i}"><i class="${data.data.all_menus[i].icon}"></i>&nbsp;&nbsp;${data.data.all_menus[i].name}</label>
 									<ul style="padding-left:0.9rem">`;
 							for (let j = 0; j < data.data.all_menus.length; j++) {
 								if (data.data.all_menus[j].parent_id == data.data.all_menus[i].id) {
@@ -379,7 +377,7 @@
 							list += `
 								<li class="form-check" style="padding:5px 0.5rem">
 									<input type="checkbox" name="menu_id[]" id="check_menu_${i}" onclick="checkParent(this)" value="${data.data.all_menus[i].id}" class="form-check-input check me-1" ${checked}>
-									<label class="form-check-label" for="check_menu_${i}"><b><i class="${data.data.all_menus[i].icon}"></i>&nbsp;&nbsp;${data.data.all_menus[i].name}</b></label>
+									<label class="form-check-label" for="check_menu_${i}"><i class="${data.data.all_menus[i].icon}"></i>&nbsp;&nbsp;${data.data.all_menus[i].name}</label>
 									<ul style="padding-left:0.9rem">`;
 							for (let j = 0; j < data.data.all_menus.length; j++) {
 								if (data.data.all_menus[j].parent_id == data.data.all_menus[i].id) {

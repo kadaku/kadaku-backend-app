@@ -47,17 +47,10 @@
         <div class="auth-page-content overflow-hidden pt-lg-5">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-9 mx-auto">
+                    <div class="col-lg-4 mx-auto">
                         <div class="card overflow-hidden">
                             <div class="row g-0">
-                                <div class="col-lg-6">
-                                    <div class="p-lg-5 p-4 auth-one-bg h-100">
-                                        <div class="bg-overlay"></div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     @yield('content')
                                 </div>
                                 <!-- end col -->
@@ -81,7 +74,7 @@
                     <div class="col-lg-12">
                         <div class="text-center">
                             <p class="mb-0">&copy;
-                            	{{ '2022 - ' . date('Y') }} {{ brand()->name }} Crafted with <i class="mdi mdi-heart text-danger"></i> by Cafeweb Indonesia
+                            	{{ '2023 - ' . date('Y') }} {{ brand()->name }} Crafted with <i class="mdi mdi-heart text-danger"></i> by PT. Cafe Media Inovasi
                             </p>
                         </div>
                     </div>

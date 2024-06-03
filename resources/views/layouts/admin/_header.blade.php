@@ -48,7 +48,7 @@
                         aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
                             @if (auth()->user()->photo)
-                                <img class="rounded-circle header-profile-user" src="" alt="Header Avatar">
+								<img class="rounded-circle header-profile-user" src="{{ asset('storage/images/accounts/avatars/'.auth()->user()->photo) }}" alt="Header Avatar">
                             @else
                                 <img class="rounded-circle p-1 bg-secondary header-profile-user" src="{{ asset('storage/images/accounts/avatar.png') }}" alt="Header Avatar">
                             @endif

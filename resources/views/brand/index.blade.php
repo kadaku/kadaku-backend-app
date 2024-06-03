@@ -4,12 +4,12 @@
 @section('content')
 <div class="row">
 	<div class="col-md-4">
-		<div class="card radius-15" style="background-color:rgb(19,31,59)">
+		<div class="card radius-15 card-warning">
 			<div class="card-body text-center">
 				<img src="" id="logo_brand" width="200" class="p-1" alt="">
-				<h5 id="name_brand" class="mb-0 mt-4 text-white"></h5>
-				<p id="email_brand" class="mb-0 text-white"></p>
-				<p id="address_brand" class="mb-0 text-white"></p>
+				<h5 id="name_brand" class="mb-0 mt-4"></h5>
+				<p id="email_brand" class="mb-0"></p>
+				<p id="address_brand" class="mb-0"></p>
 				<div class="list-inline contacts-social mt-3">
 					<a href="" id="link_phone_brand" class="list-inline-item"><i class="bx bxs-phone"></i> <span id="phone_brand"></span></a>
 				</div>
@@ -18,7 +18,7 @@
 	</div>
 	<div class="col-md-8">
 		<div class="card shadow radius-10">
-			<div class="card-header"><strong>Form Update Brand Website</strong></div>
+			<div class="card-header"><h5 class="mb-0"><strong>Form Update Brand Website</strong></h5></div>
 			<div class="card-body">
 				<form action="" id="form_add" enctype="multipart/form-data">
                     @csrf

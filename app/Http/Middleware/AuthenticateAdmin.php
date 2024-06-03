@@ -16,7 +16,7 @@ class AuthenticateAdmin
     public function handle(Request $request, Closure $next, $guard = "admin"): Response
     {
         if(!auth()->guard($guard)->check()) {
-            return redirect(url('login'));
+            return redirect(url('panel-admin-kadaku'));
         }
         return $next($request);
     }

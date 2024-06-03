@@ -6,8 +6,8 @@
 	<div class="card-header">
 		<div class="row">
 			<div class="col-md-6">
-				<button type="button" id="btn_add" class="btn btn-primary btn-block btn-sm me-1"><i class="bx bx-plus-circle"></i> Add Data</button>
-				<button type="button" id="btn_reload" class="btn btn-secondary btn-block btn-sm"><i class="bx bx-sync"></i> Refresh Data</button>
+				<button type="button" id="btn_add" class="btn btn-primary btn-label btn-block btn-sm"><i class="fas fa-plus label-icon align-middle fs-16 me-2"></i>Add Data</button>
+				<button type="button" id="btn_reload" class="btn btn-secondary btn-label btn-block btn-sm"><i class="fas fa-sync label-icon align-middle fs-16 me-2"></i>Refresh Data</button>
 			</div>
 			<div class="col-md-6">
 				<div class="custom-search">
@@ -20,8 +20,8 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="table-responsive">
-					<table id="table_list" class="table table-striped table-hover">
-						<thead class="table-light">
+					<table id="table_list" class="table table-striped table-hover table-sm">
+						<thead>
 							<tr>
 								<th class="center" width="15%">No.</th>
 								<th width="40%">Name</th>
@@ -51,51 +51,51 @@
 <div class="modal fade" id="modal_form" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
-            <form action="" id="form_add">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal_form_label">Form Add Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="id" class="validate">
-                    <input type="hidden" name="parent_id" class="validate">
-                    <div class="form-group row mb-2">
-                        <label class="form-label col-md-3">Name Menu <span class="text-danger">*)</span></label>
-                        <div class="col-md-9">
-                            <input type="text" name="name" class="form-control validate" placeholder="Name Menu ...">
-                        </div>
-                    </div>
-                    <div class="form-group row mb-2">
-                        <label class="form-label col-md-3">Path <span class="text-danger">*)</span></label>
-                        <div class="col-md-9">
-                            <div class="input-group">
-                                <span class="input-group-text">{{ url('/') }}</span>
-                                <input type="text" name="path" class="form-control validate" placeholder="Path ...">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row mb-2 icon_parent">
-                        <label class="form-label col-md-3">Icon <span class="text-danger">*)</span></label>
-                        <div class="col-md-9">
-                            <div class="input-group">
-                                <button class="btn btn-primary search_boxicons" type="button"><i class="bx bx-search-alt"></i> Search Icon</button>
-                                <span class="input-group-text"><i id="icon_boxicons"></i></span>
-                                <input type="text" name="icon" class="form-control input_boxicons validate" placeholder="Icon ...">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row mb-2">
-                        <label class="form-label col-md-3">Position <span class="text-danger">*)</span></label>
-                        <div class="col-md-9">
-                            <input type="number" min="1" name="position" class="form-control validate" placeholder="Index Sort ...">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bx bx-x-circle"></i> Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="bx bx-save"></i> Save</button>
-                </div>
+			<form action="" id="form_add">
+				@csrf
+				<div class="modal-header">
+					<h5 class="modal-title" id="modal_form_label">Form Add Data</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" name="id" class="validate">
+					<input type="hidden" name="parent_id" class="validate">
+					<div class="form-group row mb-2">
+						<label class="form-label col-md-3">Name Menu <span class="text-danger">*)</span></label>
+						<div class="col-md-9">
+							<input type="text" name="name" class="form-control validate" placeholder="Name Menu ...">
+						</div>
+					</div>
+					<div class="form-group row mb-2">
+						<label class="form-label col-md-3">Path <span class="text-danger">*)</span></label>
+						<div class="col-md-9">
+							<div class="input-group">
+								<span class="input-group-text">{{ url('/') }}</span>
+								<input type="text" name="path" class="form-control input-group validate" placeholder="Path ...">
+							</div>
+						</div>
+					</div>
+					<div class="form-group row mb-2 icon_parent">
+						<label class="form-label col-md-3">Icon <span class="text-danger">*)</span></label>
+						<div class="col-md-9">
+							<div class="input-group">
+								<button class="btn btn-primary search_boxicons" type="button"><i class="bx bx-search-alt"></i> Search Icon</button>
+								<span class="input-group-text"><i id="icon_boxicons"></i></span>
+								<input type="text" name="icon" class="form-control input-group input_boxicons validate" placeholder="Icon ...">
+							</div>
+						</div>
+					</div>
+					<div class="form-group row mb-2">
+						<label class="form-label col-md-3">Position <span class="text-danger">*)</span></label>
+						<div class="col-md-9">
+							<input type="number" min="1" name="position" class="form-control validate" placeholder="Index Sort ...">
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-label" data-bs-dismiss="modal"><i class="fas fa-circle-xmark label-icon align-middle fs-16 me-2"></i>Cancel</button>
+					<button type="submit" class="btn btn-primary btn-label"><i class="fas fa-save label-icon align-middle fs-16 me-2"></i>Save</button>
+				</div>
 			</form>
 		</div>
 	</div>
@@ -151,8 +151,8 @@
 				showCancelButton: true,
 				confirmButtonColor: '#FF6E31',
 				cancelButtonColor: '#6c757d',
-				cancelButtonText: '<i class="bx bx-x-circle"></i> Close',
-				confirmButtonText: '<i class="bx bx-paper-plane"></i> Yes',
+				cancelButtonText: '<i class="fas fa-circle-xmark me-2"></i>Cancel',
+				confirmButtonText: '<i class="fas fa-paper-plane me-2"></i>Yes',
 				allowOutsideClick: false,
 				reverseButtons: true,
 			}).then((result) => {
@@ -164,7 +164,7 @@
 						data: data,
 						cache: false,
 						contentType: false,
-                        processData: false,
+						processData: false,
 						dataType: 'JSON',
 						beforeSend: function() {
 							showLoader();
@@ -172,8 +172,8 @@
 						success: function(data) {
 							if (data.validate == true) {
 								syamValidationServer('[name="name"]', 'name', data);
-								syamValidationServer('[name="path"]', 'path', data);
-								syamValidationServer('[name="icon"]', 'icon', data);
+								syamValidationGroupServer('[name="path"]', 'path', data);
+								syamValidationGroupServer('[name="icon"]', 'icon', data);
 								syamValidationServer('[name="position"]', 'position', data);
 								return false;
 							}
@@ -201,6 +201,7 @@
 		$('.validate').keyup(function() {
 			if ($(this).val() !== '') {
 				syamValidationRemove(this);
+				syamValidationGroupRemove(this);
 			}
 		});
 		
@@ -223,22 +224,22 @@
 				$('#page_list').val(page);
 			},
 			success: function(data) {
-                $('#table_list tbody').empty();
-                if ((page > 1) && (data.data.list.length == 0)) {
-                    getListData(page - 1);
-                    return false;
-                }
+				$('#table_list tbody').empty();
+				if ((page > 1) && (data.data.list.length == 0)) {
+						getListData(page - 1);
+						return false;
+				}
 
-                $('#pagination').html(pagination(data.data.total, data.data.limit, data.data.page, 1));
-                $('#summary').html(pageSummary(data.data.total, data.data.list.length, data.data.limit, data.data.page));
+				$('#pagination').html(pagination(data.data.total, data.data.limit, data.data.page, 1));
+				$('#summary').html(pageSummary(data.data.total, data.data.list.length, data.data.limit, data.data.page));
 
-                // if (tipeData === 'list') {
-                    $('#table_list').treetable('destroy');
-                    extractData(data);
-                    $('#table_list').treetable('expandAll');
-                // } else {
-                    // showListData(data);
-                // }
+				// if (tipeData === 'list') {
+						$('#table_list').treetable('destroy');
+						extractData(data);
+						$('#table_list').treetable('expandAll');
+				// } else {
+						// showListData(data);
+				// }
 			},
 			complete: function() {
 				hideLoader();
@@ -258,6 +259,7 @@
 		$('#icon_boxicons').removeClass();
 		$('.validate, #keyword_search').val('');
 		syamValidationRemove('.form-control');
+		syamValidationGroupRemove('.input-group');
 	}
 
 	function showListData(data) {
@@ -326,12 +328,12 @@
 		var bold = '';
 
 		if (no !== '') {
-			btn_add = '<button type="button" class="btn btn-primary btn-sm" onclick="addSubMenu(' + v.id + ',' + '\'' + v.name + '\'' + ',' + page + ')" title="Klik untuk menambah sub menu"><i class="bx bx-plus-circle"></i></button> ';
+			btn_add = '<button type="button" class="btn btn-primary btn-label btn-sm" onclick="addSubMenu(' + v.id + ',' + '\'' + v.name + '\'' + ',' + page + ')" title="Click for add sub menu"><i class="fas fa-plus label-icon align-middle fs-14 me-2"></i>Add Sub</button> ';
 		}
 
 		if (v.id !== '') {
-			btn = '<button type="button" class="btn btn-success btn-sm" onclick="editData(' + v.id + ', ' + page + ')" title="Klik untuk menambah mengubah"><i class="bx bx-edit"></i></button> ' +
-				'<button type="button" class="btn btn-danger btn-sm" onclick="deleteData(' + v.id + ', ' + page + ')" title="Klik untuk menghapus sub menu"><i class="bx bx-trash"></i></button> ';
+			btn = '<button type="button" class="btn btn-success btn-label btn-sm" onclick="editData(' + v.id + ', ' + page + ')" title="Click for update data"><i class="fas fa-edit label-icon align-middle fs-14 me-2"></i>Edit</button> ' +
+				'<button type="button" class="btn btn-danger btn-label btn-sm" onclick="deleteData(' + v.id + ', ' + page + ')" title="Click for delete data"><i class="fas fa-trash-alt label-icon align-middle fs-14 me-2"></i>Delete</button> ';
 		}
 		
 		var html = '<tr ' + branch + ' ' + parent + '>' +
@@ -352,7 +354,7 @@
 			cache: false,
 			dataType: 'JSON',
 			beforeSend: function() {
-                resetForm();
+				resetForm();
 				showLoader();
 				$('#page_list').val(page);
 			},
@@ -373,8 +375,8 @@
 					$('#modal_form').modal('show');
 					$('#modal_form_label').text('Form Update Data');
 				} else {
-                    toastrAlert('warning', 'Information', data.message);
-                }
+					toastrAlert('warning', 'Information', data.message);
+				}
 			},
 			complete: function() {
 				hideLoader();
@@ -393,8 +395,8 @@
 			showCancelButton: true,
 			confirmButtonColor: '#FF6E31',
 			cancelButtonColor: '#6c757d',
-			cancelButtonText: '<i class="bx bx-x-circle"></i> Cancel',
-			confirmButtonText: '<i class="bx bx-paper-plane"></i> Yes',
+			cancelButtonText: '<i class="fas fa-circle-xmark me-2"></i>Cancel',
+			confirmButtonText: '<i class="fas fa-paper-plane me-2"></i>Yes',
 			allowOutsideClick: false,
 			reverseButtons: true,
 		}).then((result) => {
