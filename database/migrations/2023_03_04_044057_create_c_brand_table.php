@@ -35,7 +35,6 @@ return new class extends Migration
             $table->string('instagram')->nullable();
             $table->string('twitter')->nullable();
             $table->string('tiktok')->nullable();
-            $table->string('twitter')->nullable();
             $table->timestamps();
         });
     }

@@ -11,8 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('c_menus_editor', function (Blueprint $table) {
+        Schema::create('m_categories_musics', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8mb4';
+            $table->collation = 'utf8mb4_general_ci';
+
             $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->tinyInteger('is_active')->default(1);
             $table->timestamps();
         });
     }
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('c_menus_editor');
+        Schema::dropIfExists('m_categories_musics');
     }
 };
