@@ -32,7 +32,7 @@ class PrivilegesModel extends Model
     function list_data($start, $limit, $search)
     {
         $data["list"] = $this->_query($start, $limit, $search);
-        $data["total"] = $this->_query(null, null, $search)->count();
+        $data["total"] = $this->_query(0, 0, $search)->count();
         return $data;
     }
 

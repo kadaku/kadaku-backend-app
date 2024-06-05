@@ -92,7 +92,7 @@
 						<label class="form-label col-md-4">Privilege <span class="text-danger">*)</span></label>
 						<div class="col-md-8">
 							<select name="user_group_id" id="user_group_id" class="form-select form-control">
-								<option value="">-- Pilih --</option>
+								<option value="">-- Choose --</option>
 								@foreach ($user_groups as $row)
 									<option value="{{ $row->id }}">{{ $row->name }}</option>
 								@endforeach

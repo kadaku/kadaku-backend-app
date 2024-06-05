@@ -27,6 +27,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 	});
 
 	Route::group(['middleware' => ['admin']], function () {
+		/** 
+		 * Dev
+		 */
+		Route::get('/developer/scraping', 'DevController@scraping');
+		Route::get('/developer/download', 'DevController@download');
+
 		/**
 		 * Logout Routes
 		 */
@@ -121,5 +127,27 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		Route::post('/coupons/update-status', 'CouponsController@update');
 		Route::post('/coupons/store', 'CouponsController@store');
 		Route::delete('/coupons/destroy/{id}', 'CouponsController@destroy');
+
+		/** 
+		 * Masterdata -> Categories Musics
+		 */
+		Route::get('/categories-musics', 'CategoriesMusicsController@index');
+		Route::get('/categories-musics/list', 'CategoriesMusicsController@list');
+		Route::get('/categories-musics/show/{id}', 'CategoriesMusicsController@show');
+		Route::post('/categories-musics/update-status', 'CategoriesMusicsController@update');
+		Route::post('/categories-musics/store', 'CategoriesMusicsController@store');
+		Route::delete('/categories-musics/destroy/{id}', 'CategoriesMusicsController@destroy');
+		
+		/** 
+		 * Masterdata -> Musics
+		 */
+		Route::get('/musics', 'MusicsController@index');
+		Route::get('/musics/list', 'MusicsController@list');
+		Route::get('/musics/show/{id}', 'MusicsController@show');
+		Route::post('/musics/update-status', 'MusicsController@update');
+		Route::post('/musics/store', 'MusicsController@store');
+		Route::delete('/musics/destroy/{id}', 'MusicsController@destroy');
+		Route::get('/musics/sync-musics', 'MusicsController@scraping_musics');
+		Route::get('/musics/sync-file-musics', 'MusicsController@scraping_file_musics');
 	});
 });

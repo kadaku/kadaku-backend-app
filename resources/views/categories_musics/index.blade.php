@@ -24,13 +24,9 @@
 						<thead>
 							<tr>
 								<th class="center" width="5%">No.</th>
-								<th width="10%">Code</th>
-								<th class="nowrap" width="35%">Name</th>
-								<th width="10%">Periode</th>
-								<th class="right" width="10%">Amount</th>
-								<th class="right" width="10%">Minimum Amount</th>
+								<th width="40%">Name</th>
+								<th width="40%">Slug</th>
 								<th width="5%">Status</th>
-								<th class="nowrap" width="5%">Created By</th>
 								<th widht="5%"></th>
 							</tr>
 						</thead>
@@ -52,9 +48,9 @@
 </div>
 
 <div class="modal fade" id="modal_form" data-bs-backdrop="static">
-	<div class="modal-dialog" style="max-width:600px">
+	<div class="modal-dialog">
 		<div class="modal-content">
-			<form action="" id="form_add" enctype="multipart/form-data">
+			<form action="" id="form_add">
 				@csrf
 				<div class="modal-header">
 					<h5 class="modal-title" id="modal_form_label"><strong>Form Add Data</strong></h5>
@@ -68,75 +64,6 @@
 							<input type="text" name="name" class="form-control validate" placeholder="Name ...">
 						</div>
 					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Code <span class="text-danger">*)</span></label>
-						<div class="col-md-8">
-							<input type="text" name="code" class="form-control validate" placeholder="Code ...">
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Description</label>
-						<div class="col-md-8">
-              <textarea name="description" class="form-control validate" rows="3" placeholder="Description ..."></textarea>
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Periode Start <span class="text-danger">*)</span></label>
-						<div class="col-md-8">
-							<div class="input-group">
-                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                <input type="text" name="periode_start" id="periode_start" class="form-control datetimepicker" data-provider="flatpickr" data-date-format="Y-m-d" data-enable-time required>
-              </div>
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Periode End <span class="text-danger">*)</span></label>
-						<div class="col-md-8">
-							<div class="input-group">
-                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                <input type="text" name="periode_end" id="periode_end" class="form-control datetimepicker" data-provider="flatpickr" data-date-format="Y-m-d" data-enable-time required>
-              </div>
-						</div>
-					</div>
-          <div class="form-group row mb-2">
-						<label class="form-label col-md-4">Amount</label>
-						<div class="col-md-8">
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-dollar"></i></span>
-                <input type="text" name="amount" onkeypress="return justNumber(event)" onkeyup="convertToCurrency(this)" class="form-control validate" value="0" placeholder="Amount ...">
-              </div>
-						</div>
-					</div>
-          <div class="form-group row mb-2">
-						<label class="form-label col-md-4">Minimum Amount</label>
-						<div class="col-md-8">
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-dollar"></i></span>
-                <input type="text" name="minimum_amount" onkeypress="return justNumber(event)" onkeyup="convertToCurrency(this)" class="form-control validate" value="0" placeholder="Minimum Amount ...">
-              </div>
-						</div>
-					</div>
-					<div class="form-group row mb-0">
-						<label class="form-label bold col-md-4">Thumbnail</label>
-						<div class="col-md-8">
-							<input type="hidden" name="file_thumbnail_old">
-							<input type="file" name="file_thumbnail" class="form-control validate" accept=".png, .jpeg, .jpg">
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label bold col-md-4"></label>
-						<div class="col-md-8">
-							<small class="text-danger">
-								<em>*) Image type must png, jpg, jpeg, Maximum size 5 MB.</em>
-							</small>
-						</div>
-					</div>
-					<div class="form-group row mb-2 image_preview" style="display:none">
-						<label class="form-label col-md-4"></label>
-						<div class="col-md-8">
-							<img id="image_preview" width="100" height="100" class="img-fluid rounded d-block img-thumbnail">
-						</div>
-					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-label" data-bs-dismiss="modal"><i class="fas fa-circle-xmark label-icon align-middle fs-16 me-2"></i>Cancel</button>
@@ -148,17 +75,10 @@
 </div>
 
 <script>
-	var maxFileSize = 2 * 1024 * 1024;
-	var className = '/coupons';
+	var className = '/categories-musics';
 
 	$(function() {
 		getListData();
-
-    $('.datetimepicker').flatpickr({
-      enableTime: true,
-      time_24hr: true,
-      dateFormat: 'Y-m-d H:i'
-    });
 
 		$('#keyword_search').keyup(function() {
 			getListData();
@@ -173,19 +93,6 @@
 		$('#btn_reload').click(function() {
 			resetForm();
 			getListData();
-		});
-
-		$('[name="file_thumbnail"]').change(function() {
-			if (this.files[0].size > maxFileSize) {
-				$('[name="file_thumbnail"]').val('');
-				$('.image_preview').hide();
-				$('#image_preview').attr('src', '');
-				swalAlert('warning', 'Information', 'Image size cannot be more than 2 mb');
-				return false;
-			} else {
-        $('.image_preview').show();
-				$('#image_preview').attr('src', URL.createObjectURL(this.files[0]));
-			}
 		});
 
 		$('#form_add').submit(function(e) {
@@ -225,13 +132,6 @@
 						success: function(data) {
 							if (data.validate == true) {
 								syamValidationServer('[name="name"]', 'name', data);
-								syamValidationServer('[name="code"]', 'code', data);
-								syamValidationServer('[name="description"]', 'description', data);
-								syamValidationGroupServer('[name="periode_start"]', 'periode_start', data);
-								syamValidationGroupServer('[name="periode_end"]', 'periode_end', data);
-								syamValidationGroupServer('[name="amount"]', 'amount', data);
-								syamValidationGroupServer('[name="minimum_amount"]', 'minimum_amount', data);
-								syamValidationServer('[name="thumbnail"]', 'thumbnail', data);
 								return false;
 							}
 
@@ -261,7 +161,7 @@
 			}
 		});
 
-		$('.form-select, .validate').change(function() {
+		$('.validate').change(function() {
 			if ($(this).val() !== '') {
 				syamValidationRemove(this);
 			}
@@ -296,25 +196,14 @@
 									<label class="form-check-label">${(v.is_active === 1 ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Unactive</span>')}</label>
 								</div>`;
 
-					var avatar = ``;
-					if (v.url_thumbnail !== null) {
-						avatar = `<a data-fancybox data-src="${v.url_thumbnail}" data-caption="${v.name}">
-									<img src="${v.url_thumbnail}" class="rounded-circle shadow" width="34" height="34">
-								</a>`;
-					}
-
 					var html = '<tr>' +
 						'<td class="center">' + no + '</td>' +
-						'<td>' + v.code + '</td>' +
-						'<td>' + v.name + (v.description != null ? '<br><small class="text-muted">' + v.description + '</small>' : '-') + '</td>' +
-						'<td class="nowrap">' + dateTimeSlash(v.periode_start) + '<br>' + dateTimeSlash(v.periode_end) + '</td>' +
-						'<td class="nowrap right">' + numberToCurrency(v.amount) + '</td>' +
-						'<td class="nowrap right">' + numberToCurrency(v.minimum_amount) + '</td>' +
+						'<td class="nowrap">' + v.name + '</td>' +
+						'<td class="nowrap">' + v.slug + '</td>' +
 						'<td class="nowrap">' + status + '</td>' +
-						'<td><small>' + (v.created_by != null ? v.created_by : '') + '</small></td>' +
 						'<td class="right nowrap">' +
-              '<button type="button" class="btn btn-success btn-sm" onclick="editData(' + v.id + ', ' + data.data.page + ')"><i class="fas fa-edit"></i></button> ' +
-              '<button type="button" class="btn btn-danger btn-sm" onclick="deleteData(' + v.id + ', ' + data.data.page + ')"><i class="fas fa-trash-alt"></i></button>' +
+						'<button type="button" class="btn btn-success btn-sm" onclick="editData(' + v.id + ', ' + data.data.page + ')"><i class="fas fa-edit"></i></button> ' +
+						'<button type="button" class="btn btn-danger btn-sm" onclick="deleteData(' + v.id + ', ' + data.data.page + ')"><i class="fas fa-trash-alt"></i></button>' +
 						'</td>' +
 						'</tr>';
 
@@ -337,13 +226,8 @@
 	function resetForm() {
 		$('#form_add')[0].reset();
 		$('.validate, #keyword_search').val('');
-		$('.datetimepicker').val('<?php echo date('Y-m-d 08:00') ?>');
-    $('[name="amount"], [name="minimum_amount"]').val('0');
 		$('.form-control').prop('readonly', false);
 		syamValidationRemove('.form-control');
-		syamValidationGroupRemove('.form-control');
-    $('.image_preview').hide();
-		$('#image_preview').attr('src', '');
 	}
 
 	function updateStatus(id, status) {
@@ -389,22 +273,8 @@
 			},
 			success: function(data) {
 				if (data.status) {
-					$('.form_username, .form_password').hide();
-
 					$('[name="id"]').val(data.data.id);
 					$('[name="name"]').val(data.data.name);
-					$('[name="code"]').val(data.data.code);
-					$('[name="description"]').val(data.data.description);
-					$('[name="periode_start"]').val(data.data.periode_start);
-					$('[name="periode_end"]').val(data.data.periode_end);
-					$('[name="amount"]').val(data.data.amount);
-					$('[name="minimum_amount"]').val(data.data.minimum_amount);
-					
-					$('[name="file_thumbnail_old"]').val(data.data.thumbnail)
-					if (data.data.url_thumbnail !== null) {
-            $('.image_preview').show();
-						$('#image_preview').attr('src', data.data.url_thumbnail)
-					}
 
 					$('#modal_form').modal('show');
 					$('#modal_form_label').text('Form Update Data');

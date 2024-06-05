@@ -17,9 +17,12 @@ return new class extends Migration
             $table->collation = 'utf8mb4_general_ci';
 
             $table->id();
-            $table->unsignedBigInteger('category_music_id');
+            $table->unsignedBigInteger('category_music_id')->nullable();
             $table->string('name');
             $table->binary('file')->nullable();
+            $table->longText('categories')->nullable();
+            $table->longText('file_url')->nullable();
+            $table->unsignedBigInteger('temp_id')->nullable();
             $table->tinyInteger('is_active')->default(1);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('modified_by')->nullable();

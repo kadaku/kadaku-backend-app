@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class CategoriesModel extends Model
+class CategoriesMusicsModel extends Model
 {
-	use HasFactory;
+    use HasFactory;
 
-	protected $table = "m_categories";
-	protected $fillable = ["name", "slug", "icon", "meta_title", "meta_description", "is_active"];
+    protected $table = "m_categories_musics";
+	protected $fillable = ["name", "slug", "is_active"];
 
 	function _query($start, $limit, $search)
 	{
@@ -22,7 +22,6 @@ class CategoriesModel extends Model
 		$keyword = isset($search["keyword"]) && $search["keyword"] !== "" ? $search["keyword"] : NULL;
 		if ($keyword) {
 			$query->where("a.name", "like", "%$keyword%");
-			$query->orWhere("a.meta_title", "like", "%$keyword%");
 		}
 		if ($limit !== 0) $query->offset($start)->limit($limit);
 		$data = $query->get();

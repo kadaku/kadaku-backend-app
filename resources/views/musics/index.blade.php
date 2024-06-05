@@ -5,11 +5,13 @@
 <div class="card shadow radius-10">
 	<div class="card-header">
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-8">
 				<button type="button" id="btn_add" class="btn btn-primary btn-label btn-block btn-sm"><i class="fas fa-plus label-icon align-middle fs-16 me-2"></i>Add Data</button>
 				<button type="button" id="btn_reload" class="btn btn-secondary btn-label btn-block btn-sm"><i class="fas fa-sync label-icon align-middle fs-16 me-2"></i>Refresh Data</button>
+				<button type="button" id="btn_sync_music" class="btn btn-success btn-label btn-block btn-sm"><i class="fas fa-download label-icon align-middle fs-16 me-2"></i>Sync Musics</button>
+				<button type="button" id="btn_sync_file_music" class="btn btn-warning btn-label btn-block btn-sm"><i class="fas fa-download label-icon align-middle fs-16 me-2"></i>Sync File Musics</button>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-4">
 				<div class="custom-search">
 					<input type="text" class="form-search" id="keyword_search" placeholder="Parameter Search...">
 				</div>
@@ -24,13 +26,10 @@
 						<thead>
 							<tr>
 								<th class="center" width="5%">No.</th>
-								<th width="10%">Code</th>
-								<th class="nowrap" width="35%">Name</th>
-								<th width="10%">Periode</th>
-								<th class="right" width="10%">Amount</th>
-								<th class="right" width="10%">Minimum Amount</th>
+								<th width="35%">Name</th>
+								<th width="30%">File</th>
+								<th width="10%">Category Music</th>
 								<th width="5%">Status</th>
-								<th class="nowrap" width="5%">Created By</th>
 								<th widht="5%"></th>
 							</tr>
 						</thead>
@@ -62,6 +61,17 @@
 				</div>
 				<div class="modal-body">
 					<input type="hidden" name="id" class="validate">
+          <div class="form-group row mb-2">
+						<label class="form-label col-md-4">Category Music <span class="text-danger">*)</span></label>
+						<div class="col-md-8">
+							<select name="category_music_id" id="category_music_id" class="form-select form-control">
+								<option value="">-- Choose --</option>
+								@foreach ($categories_musics as $row)
+									<option value="{{ $row->id }}">{{ $row->name }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
 					<div class="form-group row mb-2">
 						<label class="form-label col-md-4">Name <span class="text-danger">*)</span></label>
 						<div class="col-md-8">
@@ -69,72 +79,24 @@
 						</div>
 					</div>
 					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Code <span class="text-danger">*)</span></label>
+						<label class="form-label col-md-4">Categories</label>
 						<div class="col-md-8">
-							<input type="text" name="code" class="form-control validate" placeholder="Code ...">
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Description</label>
-						<div class="col-md-8">
-              <textarea name="description" class="form-control validate" rows="3" placeholder="Description ..."></textarea>
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Periode Start <span class="text-danger">*)</span></label>
-						<div class="col-md-8">
-							<div class="input-group">
-                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                <input type="text" name="periode_start" id="periode_start" class="form-control datetimepicker" data-provider="flatpickr" data-date-format="Y-m-d" data-enable-time required>
-              </div>
-						</div>
-					</div>
-					<div class="form-group row mb-2">
-						<label class="form-label col-md-4">Periode End <span class="text-danger">*)</span></label>
-						<div class="col-md-8">
-							<div class="input-group">
-                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                <input type="text" name="periode_end" id="periode_end" class="form-control datetimepicker" data-provider="flatpickr" data-date-format="Y-m-d" data-enable-time required>
-              </div>
-						</div>
-					</div>
-          <div class="form-group row mb-2">
-						<label class="form-label col-md-4">Amount</label>
-						<div class="col-md-8">
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-dollar"></i></span>
-                <input type="text" name="amount" onkeypress="return justNumber(event)" onkeyup="convertToCurrency(this)" class="form-control validate" value="0" placeholder="Amount ...">
-              </div>
-						</div>
-					</div>
-          <div class="form-group row mb-2">
-						<label class="form-label col-md-4">Minimum Amount</label>
-						<div class="col-md-8">
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-dollar"></i></span>
-                <input type="text" name="minimum_amount" onkeypress="return justNumber(event)" onkeyup="convertToCurrency(this)" class="form-control validate" value="0" placeholder="Minimum Amount ...">
-              </div>
+							<input type="text" name="categories" class="form-control validate" placeholder="Categories ...">
 						</div>
 					</div>
 					<div class="form-group row mb-0">
-						<label class="form-label bold col-md-4">Thumbnail</label>
+						<label class="form-label bold col-md-4">File Mp3</label>
 						<div class="col-md-8">
-							<input type="hidden" name="file_thumbnail_old">
-							<input type="file" name="file_thumbnail" class="form-control validate" accept=".png, .jpeg, .jpg">
+							<input type="hidden" name="file_music_old">
+							<input type="file" name="file_music" class="form-control validate" accept=".mp3">
 						</div>
 					</div>
 					<div class="form-group row mb-2">
 						<label class="form-label bold col-md-4"></label>
 						<div class="col-md-8">
 							<small class="text-danger">
-								<em>*) Image type must png, jpg, jpeg, Maximum size 5 MB.</em>
+								<em>*) Audio type must mp3 Maximum size 10 MB.</em>
 							</small>
-						</div>
-					</div>
-					<div class="form-group row mb-2 image_preview" style="display:none">
-						<label class="form-label col-md-4"></label>
-						<div class="col-md-8">
-							<img id="image_preview" width="100" height="100" class="img-fluid rounded d-block img-thumbnail">
 						</div>
 					</div>
 				</div>
@@ -147,18 +109,29 @@
 	</div>
 </div>
 
+<style>
+	.play,
+	.pause {
+		width: 30px;
+	}
+	.play:hover,
+	.pause:hover {
+		cursor: pointer;
+	}
+	.pause {
+		display: none;
+	}
+</style>
+
+<link rel="stylesheet" href="{{ asset('extend/plugins/plyr/plyr.css') }}">
+<script src="{{ asset('extend/plugins/plyr/plyr.js') }}"></script>
+
 <script>
-	var maxFileSize = 2 * 1024 * 1024;
-	var className = '/coupons';
+	var maxFileSize = 10 * 1024 * 1024;
+	var className = '/musics';
 
 	$(function() {
 		getListData();
-
-    $('.datetimepicker').flatpickr({
-      enableTime: true,
-      time_24hr: true,
-      dateFormat: 'Y-m-d H:i'
-    });
 
 		$('#keyword_search').keyup(function() {
 			getListData();
@@ -175,16 +148,11 @@
 			getListData();
 		});
 
-		$('[name="file_thumbnail"]').change(function() {
+		$('[name="file_music"]').change(function() {
 			if (this.files[0].size > maxFileSize) {
-				$('[name="file_thumbnail"]').val('');
-				$('.image_preview').hide();
-				$('#image_preview').attr('src', '');
-				swalAlert('warning', 'Information', 'Image size cannot be more than 2 mb');
+				$('[name="file_music"]').val('');
+				swalAlert('warning', 'Information', 'Image size cannot be more than 10 mb');
 				return false;
-			} else {
-        $('.image_preview').show();
-				$('#image_preview').attr('src', URL.createObjectURL(this.files[0]));
 			}
 		});
 
@@ -224,14 +192,9 @@
 						},
 						success: function(data) {
 							if (data.validate == true) {
+								syamValidationServer('[name="category_music_id"]', 'category_music_id', data);
 								syamValidationServer('[name="name"]', 'name', data);
-								syamValidationServer('[name="code"]', 'code', data);
-								syamValidationServer('[name="description"]', 'description', data);
-								syamValidationGroupServer('[name="periode_start"]', 'periode_start', data);
-								syamValidationGroupServer('[name="periode_end"]', 'periode_end', data);
-								syamValidationGroupServer('[name="amount"]', 'amount', data);
-								syamValidationGroupServer('[name="minimum_amount"]', 'minimum_amount', data);
-								syamValidationServer('[name="thumbnail"]', 'thumbnail', data);
+								syamValidationServer('[name="file_music"]', 'file_music', data);
 								return false;
 							}
 
@@ -266,6 +229,58 @@
 				syamValidationRemove(this);
 			}
 		});
+
+		$('#btn_sync_music').click(function() {
+			$.ajax({
+				type: 'GET',
+				url: baseUrl + className + '/sync-musics',
+				cache: false,
+				dataType: 'JSON',
+				beforeSend: function() {
+					showLoader();
+				},
+				success: function(data) {
+					if (data.status !== false) {
+						getListData($('#page_list').val());
+						toastrAlert('success', 'Success', data.message);
+					} else {
+						toastrAlert('warning', 'Information', data.message);
+					}
+				},
+				complete: function() {
+					hideLoader();
+				},
+				error: function(e) {
+					toastrAlert('error', e.status, e.statusText);
+				}
+			});
+		});
+
+		$('#btn_sync_file_music').click(function() {
+			$.ajax({
+				type: 'GET',
+				url: baseUrl + className + '/sync-file-musics',
+				cache: false,
+				dataType: 'JSON',
+				beforeSend: function() {
+					showLoader();
+				},
+				success: function(data) {
+					if (data.status !== false) {
+						getListData($('#page_list').val());
+						toastrAlert('success', 'Success', data.message);
+					} else {
+						toastrAlert('warning', 'Information', data.message);
+					}
+				},
+				complete: function() {
+					hideLoader();
+				},
+				error: function(e) {
+					toastrAlert('error', e.status, e.statusText);
+				}
+			});
+		});
 	});
 
 	function getListData(page = 1) {
@@ -291,27 +306,28 @@
 				$('#table_list tbody').empty();
 				$.each(data.data.list, function(i, v) {
 					var no = ((i + 1) + ((data.data.page - 1) * data.data.limit));
-					var status = `<div class="form-check form-switch">
-									<input class="form-check-input me-1" type="checkbox" onclick="updateStatus(${v.id}, '${v.is_active}')" ${(v.is_active == 1 ? 'checked' : '')}>
-									<label class="form-check-label">${(v.is_active === 1 ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Unactive</span>')}</label>
-								</div>`;
+					var status = `
+						<div class="form-check form-switch">
+							<input class="form-check-input me-1" type="checkbox" onclick="updateStatus(${v.id}, '${v.is_active}')" ${(v.is_active == 1 ? 'checked' : '')}>
+							<label class="form-check-label">${(v.is_active === 1 ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Unactive</span>')}</label>
+						</div>
+					`;
 
-					var avatar = ``;
-					if (v.url_thumbnail !== null) {
-						avatar = `<a data-fancybox data-src="${v.url_thumbnail}" data-caption="${v.name}">
-									<img src="${v.url_thumbnail}" class="rounded-circle shadow" width="34" height="34">
-								</a>`;
+					var file = ``;
+					if (v.url_file !== null) {
+						file = `
+							<audio id="plyr-${v.id}" class="js-player" crossorigin playsinline>
+								<source src="${v.url_file}?dl=1" type="audio/mp3">
+							</audio>
+						`;
 					}
 
 					var html = '<tr>' +
 						'<td class="center">' + no + '</td>' +
-						'<td>' + v.code + '</td>' +
-						'<td>' + v.name + (v.description != null ? '<br><small class="text-muted">' + v.description + '</small>' : '-') + '</td>' +
-						'<td class="nowrap">' + dateTimeSlash(v.periode_start) + '<br>' + dateTimeSlash(v.periode_end) + '</td>' +
-						'<td class="nowrap right">' + numberToCurrency(v.amount) + '</td>' +
-						'<td class="nowrap right">' + numberToCurrency(v.minimum_amount) + '</td>' +
+						'<td>' + v.name + '</td>' +
+						'<td class="nowrap">' + file + '</td>' +
+						'<td>' + (v.categories != null ? v.categories : '-') + '</td>' +
 						'<td class="nowrap">' + status + '</td>' +
-						'<td><small>' + (v.created_by != null ? v.created_by : '') + '</small></td>' +
 						'<td class="right nowrap">' +
               '<button type="button" class="btn btn-success btn-sm" onclick="editData(' + v.id + ', ' + data.data.page + ')"><i class="fas fa-edit"></i></button> ' +
               '<button type="button" class="btn btn-danger btn-sm" onclick="deleteData(' + v.id + ', ' + data.data.page + ')"><i class="fas fa-trash-alt"></i></button>' +
@@ -323,6 +339,22 @@
 			},
 			complete: function() {
 				hideLoader();
+				// var controls = ["play", "progress", "duration", "mute", "volume", "download"];
+				var controls = ["play", "progress", "duration", "mute"];
+				const player = Plyr.setup(".js-player", { controls });
+
+				// expose
+				window.player = player;
+				for (var i in player) {
+					player[i].on('play', function (instance) {
+						var source = instance.detail.plyr.source;
+						for (var x in player) {
+							if (player[x].source != source) {
+								player[x].pause();
+							}
+						}
+					});
+				}
 			},
 			error: function(e) {
 				toastrAlert('error', e.status, e.statusText);
@@ -337,13 +369,8 @@
 	function resetForm() {
 		$('#form_add')[0].reset();
 		$('.validate, #keyword_search').val('');
-		$('.datetimepicker').val('<?php echo date('Y-m-d 08:00') ?>');
-    $('[name="amount"], [name="minimum_amount"]').val('0');
 		$('.form-control').prop('readonly', false);
 		syamValidationRemove('.form-control');
-		syamValidationGroupRemove('.form-control');
-    $('.image_preview').hide();
-		$('#image_preview').attr('src', '');
 	}
 
 	function updateStatus(id, status) {
@@ -392,19 +419,11 @@
 					$('.form_username, .form_password').hide();
 
 					$('[name="id"]').val(data.data.id);
+					$('[name="category_music_id"]').val(data.data.category_music_id);
 					$('[name="name"]').val(data.data.name);
-					$('[name="code"]').val(data.data.code);
-					$('[name="description"]').val(data.data.description);
-					$('[name="periode_start"]').val(data.data.periode_start);
-					$('[name="periode_end"]').val(data.data.periode_end);
-					$('[name="amount"]').val(data.data.amount);
-					$('[name="minimum_amount"]').val(data.data.minimum_amount);
-					
-					$('[name="file_thumbnail_old"]').val(data.data.thumbnail)
-					if (data.data.url_thumbnail !== null) {
-            $('.image_preview').show();
-						$('#image_preview').attr('src', data.data.url_thumbnail)
-					}
+					$('[name="categories"]').val(data.data.categories);
+
+					$('[name="file_music_old"]').val(data.data.file)
 
 					$('#modal_form').modal('show');
 					$('#modal_form_label').text('Form Update Data');
@@ -461,5 +480,21 @@
 			}
 		});
 	}
+
+	function toggleAudio(id) {
+		var audioElement = document.getElementById('player' + id)
+		var soundOn = document.getElementById('play' + id)
+		var soundOff = document.getElementById('pause' + id)
+
+		if (audioElement.paused) {
+			audioElement.play();
+			$(soundOn).show();
+			$(soundOff).hide();
+		} else {
+			audioElement.pause();
+			$(soundOn).hide();
+			$(soundOff).show();
+		}
+	} 
 </script>
 @endsection
