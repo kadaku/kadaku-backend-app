@@ -56,7 +56,31 @@
     <script src="{{ asset('extend/js/fancybox.js') }}"></script>
     <script src="{{ asset('extend/js/syam.min.js') }}"></script>
     <script src="{{ asset('extend/plugins/toastr/toastr.min.js') }}"></script>
+    <script src="{{ asset('extend/plugins/tinymce5.5.1/tinymce.min.js') }}"></script>
 
+    <script>
+        $(function() {
+            // tinymce
+            if (sessionStorage.getItem("data-layout-mode") == 'dark') {
+                useDarkMode = true;
+            } else {
+                useDarkMode = false;
+            }
+
+            $('button.light-dark-mode').click(function() {
+                var layoutMode = sessionStorage.getItem("data-layout-mode");
+                if (layoutMode === 'dark') {
+                    useDarkMode = true;
+                } else {
+                    useDarkMode = false;
+                }
+                // tinymce.remove();
+                if ($('#content').is(':visible')) {
+                    tinymcePlugin('#content', useDarkMode);
+                }
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -86,6 +110,57 @@
         $.ajaxSetup({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
         });
+
+        function tinymcePlugin(element, darkMode) {
+            if (sessionStorage.getItem("data-layout-mode") == 'dark') {
+                var darkMode = true;
+            }
+
+            var fontSurat = 'Arial';
+            var fontSizeSurat = '14px';
+            tinyMCE.init({
+                selector: element,
+                branding: false,
+                nowrap: true,
+                plugins: `preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons`,
+                editimage_cors_hosts: ['picsum.photos'],
+                menubar: false,
+                toolbar1: "newdocument | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | cut copy paste | searchreplace",
+                toolbar2: "bullist numlist | outdent indent blockquote | undo redo | link unlink anchor image media code | inserttime preview | forecolor backcolor | table | hr removeformat | subscript superscript",
+                toolbar3: "charmap emoticons | print fullscreen | ltr rtl | visualchars visualblocks nonbreaking  pagebreak restoredraft codesample",
+                table_style_by_css: false,
+                image_advtab: true,
+                importcss_append: true,
+                height: 500,
+                image_caption: true,
+                quickbars_selection_toolbar: `bold italic | quicklink h2 h3 blockquote quickimage quicktable`,
+                noneditable_class: 'mceNonEditable',
+                toolbar_mode: 'show',
+                contextmenu: 'link image table',
+                skin: darkMode ? 'oxide-dark' : 'oxide',
+                content_css: darkMode ? 'dark' : 'default',
+                content_style: 'body { font-family: ' + fontSurat + ',sans-serif; font-size:' + fontSizeSurat + ' }',
+                init_instance_callback: function(editor) {
+                    editor.on('keydown', function(e) {
+                    if (e.keyCode == 9) {
+                        e.preventDefault();
+                        tinymce.activeEditor.execCommand('mceInsertContent', false, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                    }
+                    });
+                },
+                paste_preprocess: function (plugin, args) {
+                  toastrAlert('warning', 'Validation', 'Copy/Paste not allowed.');
+                  // replace copied text with empty string
+                  args.content = '';
+                },
+                invalid_styles: {
+                    'table': 'width height',
+                    'tr': 'width height',
+                    'th': 'width height',
+                    'td': 'width height'
+                }
+            });
+        }
     </script>
 </body>
 </html>

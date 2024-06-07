@@ -149,5 +149,16 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		Route::delete('/musics/destroy/{id}', 'MusicsController@destroy');
 		Route::get('/musics/sync-musics', 'MusicsController@scraping_musics');
 		Route::get('/musics/sync-file-musics', 'MusicsController@scraping_file_musics');
+
+		/** 
+		 * Blogs
+		 */
+		Route::get('/blogs', 'BlogsController@index');
+		Route::get('/blogs/list', 'BlogsController@list');
+		Route::get('/blogs/show/{id}', 'BlogsController@show');
+		Route::post('/blogs/update-status', 'BlogsController@update_status');
+		Route::post('/blogs/update-publish', 'BlogsController@update_publish');
+		Route::post('/blogs/store', 'BlogsController@store');
+		Route::delete('/blogs/destroy/{id}', 'BlogsController@destroy');
 	});
 });

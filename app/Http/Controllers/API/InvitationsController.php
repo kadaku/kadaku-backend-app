@@ -167,7 +167,7 @@ class InvitationsController extends Controller
     {
         $data_customer = Auth::user();
         $data = InvitationsModel::where('customer_id', $data_customer->id)
-            ->when($request->q, fn ($query, $search) => $query->where('heading', 'like', '%' . $search . '%'))
+            ->when($request->q, fn ($query, $search) => $query->where('heading', 'like', '%' . $search . '%')->orWhere('domain', 'like', '%' . $search . '%'))
             ->orderBy('id', 'desc')
             ->paginate(20);
         if ($data) {
