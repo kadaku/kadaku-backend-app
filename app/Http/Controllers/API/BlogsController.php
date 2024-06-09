@@ -49,9 +49,9 @@ class BlogsController extends Controller
 		}
 	}
 
-	function show($slug) 
+	function show(Request $request) 
 	{
-		if (empty($slug)) {
+		if (empty($request->slug)) {
 			return response()->json([
 				'code' => 400,
 				'status' => false,
@@ -60,7 +60,7 @@ class BlogsController extends Controller
 		}
 		
 		$model = new BlogsModel();
-		$data = $model->find_data($slug);
+		$data = $model->find_data($request->slug);
 		if ($data) {
 			$content = [
 				'code' => 200,

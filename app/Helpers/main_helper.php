@@ -70,6 +70,49 @@ if (!function_exists('date_indonesian')) {
 	}
 }
 
+if (!function_exists('datetime_indonesian')) {
+	function datetime_indonesian($datetime, $print_day = false, $print_time = true)
+	{
+		$hari = array(
+			1 =>    'Senin',
+			'Selasa',
+			'Rabu',
+			'Kamis',
+			'Jumat',
+			'Sabtu',
+			'Minggu'
+		);
+	
+		$bulan = array(
+			1 =>   'Januari',
+			'Februari',
+			'Maret',
+			'April',
+			'Mei',
+			'Juni',
+			'Juli',
+			'Agustus',
+			'September',
+			'Oktober',
+			'November',
+			'Desember'
+		);
+		$split1    = explode(' ', $datetime);
+		$split_time = explode(':', $split1[1]);
+		$time = $split_time[0] . ':' . $split_time[1];
+		$split2    = explode('-', $split1[0]);
+		$tanggal_indonesia = $split2[2] . ' ' . $bulan[(int) $split2[1]] . ' ' . $split2[0];
+		if ($print_time) {
+			$tanggal_indonesia = $split2[2] . ' ' . $bulan[(int) $split2[1]] . ' ' . $split2[0] . ' ' . $time . ' WIB';
+		}
+		if ($print_day) {
+			$num = date('N', strtotime($datetime));
+			return $hari[$num] . ', ' . $tanggal_indonesia;
+		}
+		return $tanggal_indonesia;
+	}
+}
+
 if (!function_exists('currency_to_number')) {
 	function currency_to_number($number)
 	{

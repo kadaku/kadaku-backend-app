@@ -67,7 +67,7 @@ Route::middleware(['api_key'])->group(function () {
 
 	Route::controller(BlogsController::class)->group(function () {
 		Route::get('/blogs', 'list');
-		Route::get('/blogs/find/{slug}', 'show');
+		Route::post('/blog', 'show');
 	});
 });
 
