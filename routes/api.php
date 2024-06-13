@@ -56,6 +56,7 @@ Route::middleware(['api_key'])->group(function () {
 	Route::controller(ResetPassword::class)->group(function () {
 		Route::post('/reset-password/send-mail', 'send_mail');
 		Route::post('/reset-password/validate-token', 'validate_token');
+		Route::post('/reset-password/check', 'check');
 		Route::post('/reset-password/change', 'change');
 	});
 
@@ -113,7 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		// INVITATIONS
 		Route::controller(InvitationsController::class)->group(function () {
 			Route::prefix('/invitations')->group(function () {
-				Route::post('/check_available_domain', 'check_available_domain')->withoutMiddleware(['ensure.premium.account']);
+				Route::post('/check-available-domain', 'check_available_domain')->withoutMiddleware(['ensure.premium.account']);
 				Route::get('/', 'list')->withoutMiddleware(['ensure.premium.account']);
 				Route::get('/{id}', 'get');
 				Route::get('/{id}/all', 'get_all');
@@ -121,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
 				Route::put('/', 'update');
 				Route::post('/store/image', 'store_image');
 				Route::post('/destroy/image', 'destroy_image');
+				Route::post('/store/cover', 'store_cover');
 			});
 		});
 	});

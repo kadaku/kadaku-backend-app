@@ -31,7 +31,16 @@ if (!function_exists('convert_date_strip_to_server')) {
 		return Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d');
 	}
 }
-
+if (!function_exists('convert_timestamp_to_server')) {
+	function convert_timestamp_to_server($timestamp)
+	{ 
+		if (!empty($timestamp)) {
+			return date('Y-m-d H:i:s', strtotime($timestamp));
+		} else {
+			return NULL;
+		}
+	}
+}
 if (!function_exists('date_indonesian')) {
 	function date_indonesian($date, $print_day = false)
 	{
@@ -112,7 +121,6 @@ if (!function_exists('datetime_indonesian')) {
 		return $tanggal_indonesia;
 	}
 }
-
 if (!function_exists('currency_to_number')) {
 	function currency_to_number($number)
 	{

@@ -26,12 +26,12 @@ return new class extends Migration
             $table->text('introduction')->comment('for description in SEO')->nullable();
             
             // event
-            $table->date('first_event_date')->nullable();
-            $table->time('first_event_time')->nullable();
+            $table->dateTime('first_event_date')->nullable();
             $table->string('first_event_gmt', 5)->nullable();
             $table->text('first_event_address')->nullable();
 
             // music
+            $table->unsignedBigInteger('music_id');
             $table->string('music')->nullable();
             $table->longText('music_embed')->nullable();
             $table->tinyInteger('is_music_status')->default(1);

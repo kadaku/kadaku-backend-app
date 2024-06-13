@@ -26,7 +26,7 @@ class MusicsModel extends Model
 		$query->orderBy("a.temp_id", "desc");
 		// condition
 		$keyword = isset($search["keyword"]) && $search["keyword"] !== "" ? $search["keyword"] : NULL;
-		$category = isset($search["category"]) && $search["category"] !== "" ? $search["category"] : NULL;
+		$category = isset($search["category"]) && $search["category"] !== "" ? strtolower($search["category"]) : NULL;
 		
 		if ($keyword) $query->where("a.name", "like", "%$keyword%");
 		if ($category) $query->where("a.categories", "like", "%$category%");

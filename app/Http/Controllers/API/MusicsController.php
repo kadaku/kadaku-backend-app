@@ -27,7 +27,7 @@ class MusicsController extends Controller
 				'message' => $this->message_data_not_found,
 				'data' => [],
 			];
-			return response()->json($content, 404);
+			return response()->json($content, 200);
 		}
 	}
 
@@ -42,7 +42,7 @@ class MusicsController extends Controller
 		}
 
 		$param_search = [
-			'keyword' => $request->keyword,
+			'keyword' => $request->q,
 			'category' => $request->category,
 		];
 
@@ -68,9 +68,12 @@ class MusicsController extends Controller
 				'code' => 404,
 				'status' => false,
 				'message' => $this->message_data_not_found,
-				'data' => [],
+				'data' => [
+					'list' => [],
+					'total' => 0,
+				],
 			];
-			return response()->json($content, 404);
+			return response()->json($content, 200);
 		}
 	}
 }

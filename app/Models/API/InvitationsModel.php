@@ -10,11 +10,5 @@ class InvitationsModel extends Model
     use HasFactory;
 
     protected $table = "t_invitations";
-  
-    protected $fillable = [
-        'customer_id',
-        'category_id',
-        'theme_id',
-        'domain',
-    ];
+    protected $guarded = [];
 }
