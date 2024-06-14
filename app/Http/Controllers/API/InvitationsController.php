@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuthModel;
 use App\Models\API\InvitationsModel;
-use App\Models\BrandModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +13,15 @@ use Illuminate\Support\Facades\Storage;
 class InvitationsController extends Controller
 {
 	protected $path_cover;
+	protected $path_background_custom;
+	protected $path_background_screen_guests;
 	
 	function __construct()
 	{
 		parent::__construct();
 		$this->path_cover = 'images/invitations/covers/';	
+		$this->path_background_custom = 'images/invitations/background/customs/';	
+		$this->path_background_screen_guests = 'images/invitations/background/screen_guests/';	
 	}
 	
 	function check_available_domain(Request $request)
@@ -181,6 +183,12 @@ class InvitationsController extends Controller
 				if ($value->cover && Storage::disk('public')->exists($this->path_cover.$value->cover)) {
 					$data[$i]->cover = asset('storage/'.$this->path_cover.$value->cover);
 				}
+				if ($value->background_custom && Storage::disk('public')->exists($this->path_background_custom.$value->background_custom)) {
+					$data[$i]->background_custom = asset('storage/'.$this->path_background_custom.$value->background_custom);
+				}
+				if ($value->background_screen_guests && Storage::disk('public')->exists($this->path_background_screen_guests.$value->background_screen_guests)) {
+					$data[$i]->background_screen_guests = asset('storage/'.$this->path_background_screen_guests.$value->background_screen_guests);
+				}
 			}
 
 			return response()->json([
@@ -200,11 +208,29 @@ class InvitationsController extends Controller
 
 	function get($id)
 	{
+		if (isset($id) && empty($id)) {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Bad Request',
+			], 200);
+		}
+
 		$data_customer = Auth::user();
 		$data = InvitationsModel::where('id', '=', $id)->where('customer_id', $data_customer->id)->first();
+		if (!$data) {
+			return $this->get_by_domain($id);
+		}
+
 		if ($data) {
-			if (Storage::disk('public')->exists($this->path_cover.$data->cover)) {
+			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
+			}
+			if ($data->background_custom && Storage::disk('public')->exists($this->path_background_custom.$data->background_custom)) {
+				$data->background_custom = asset('storage/'.$this->path_background_custom.$data->background_custom);
+			}
+			if ($data->background_screen_guests && Storage::disk('public')->exists($this->path_background_screen_guests.$data->background_screen_guests)) {
+				$data->background_screen_guests = asset('storage/'.$this->path_background_screen_guests.$data->background_screen_guests);
 			}
 
 			$data_theme = DB::table('m_themes as t')
@@ -281,8 +307,14 @@ class InvitationsController extends Controller
 		$data_customer = Auth::user();
 		$data = InvitationsModel::where('id', '=', $id)->where('customer_id', $data_customer->id)->first();
 		if ($data) {
-			if (Storage::disk('public')->exists($this->path_cover.$data->cover)) {
+			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
+			}
+			if ($data->background_custom && Storage::disk('public')->exists($this->path_background_custom.$data->background_custom)) {
+				$data->background_custom = asset('storage/'.$this->path_background_custom.$data->background_custom);
+			}
+			if ($data->background_screen_guests && Storage::disk('public')->exists($this->path_background_screen_guests.$data->background_screen_guests)) {
+				$data->background_screen_guests = asset('storage/'.$this->path_background_screen_guests.$data->background_screen_guests);
 			}
 			
 			$data_theme = DB::table('m_themes as t')
@@ -364,8 +396,14 @@ class InvitationsController extends Controller
 		}
 		$data = InvitationsModel::where('domain', '=', $domain)->first();
 		if ($data) {
-			if (Storage::disk('public')->exists($this->path_cover.$data->cover)) {
+			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
+			}
+			if ($data->background_custom && Storage::disk('public')->exists($this->path_background_custom.$data->background_custom)) {
+				$data->background_custom = asset('storage/'.$this->path_background_custom.$data->background_custom);
+			}
+			if ($data->background_screen_guests && Storage::disk('public')->exists($this->path_background_screen_guests.$data->background_screen_guests)) {
+				$data->background_screen_guests = asset('storage/'.$this->path_background_screen_guests.$data->background_screen_guests);
 			}
 
 			$data_theme = DB::table('m_themes as t')
@@ -567,6 +605,9 @@ class InvitationsController extends Controller
 				], 200);
 			}
 		}
+
+		// cek apakah ada update tema atau tidak
+		// !! belum
 
 		$styles = NULL;
 		if (isset($payload['styles']) && $payload['styles']) {
@@ -770,6 +811,99 @@ class InvitationsController extends Controller
 				'code' => 400,
 				'status' => false,
 				'message' => 'Not Authorized to Store Cover'
+			], 400);
+		}
+	}
+
+	function store_background_custom(Request $request)
+	{
+		$update = false;
+		$url_background_custom = null;
+		if (DB::table('t_invitations')->where('id', $request->invitation_id)->exists()) {
+			// upload photo
+			if ($request->file('background_custom')) {
+				// remove the old avatar if it exists
+				$file_old = DB::table('t_invitations')->select(['background_custom'])->where('id', $request->invitation_id)->first();
+				if ($file_old && Storage::disk('public')->exists($this->path_background_custom.$file_old->background_custom)) {
+					Storage::disk('public')->delete($this->path_background_custom.$file_old->background_custom);
+				}
+				$file = $request->file('background_custom');
+				$file_ext = 'webp';
+				$file_name = 'inv-bg-custom-'.$request->invitation_id.'-'.time().'-'.sha1($request->invitation_id);
+				$file_name_fix = $file_name.'.'.$file_ext;
+				$webp_image = $this->convert_to_webp($file->getPathname());
+				
+				Storage::disk('public')->put($this->path_background_custom.$file_name_fix, $webp_image);
+				$data['background_custom'] = $file_name_fix;
+				$update = DB::table('t_invitations')
+				->where('id', $request->invitation_id)
+				->where('customer_id', Auth::user()->id)
+				->update($data);
+			
+				if (Storage::disk('public')->exists($this->path_background_custom.$file_name_fix)) {
+					$url_background_custom = asset('storage/'.$this->path_background_custom.$file_name_fix);
+				}
+			}
+			// end upload photo
+
+			if ($update) {
+				return response()->json([
+					'code' => 200,
+					'status' => true,
+					'message' => 'Successfully Upload Background',
+					'data' => [
+						'background_custom' => $url_background_custom,
+					]
+				], 200);
+			} else {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Failed Upload Background'
+				], 400);	
+			}
+		} else {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Not Authorized to Store Background'
+			], 400);
+		}
+	}
+
+	function destroy_background_custom(Request $request)
+	{
+		$update = false;
+		if (DB::table('t_invitations')->where('id', $request->invitation_id)->exists()) {
+			$file_old = DB::table('t_invitations')->select(['background_custom'])->where('id', $request->invitation_id)->first();
+
+			$update = DB::table('t_invitations')
+				->where('id', $request->invitation_id)
+				->where('customer_id', Auth::user()->id)
+				->update(['background_custom' => NULL]);
+
+			if ($file_old && Storage::disk('public')->exists($this->path_background_custom.$file_old->background_custom)) {
+				Storage::disk('public')->delete($this->path_background_custom.$file_old->background_custom);
+			}
+
+			if ($update) {
+				return response()->json([
+					'code' => 200,
+					'status' => true,
+					'message' => 'Successfully Destroy Background',
+				], 200);
+			} else {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Failed Destroy Background'
+				], 400);	
+			}
+		} else {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Not Authorized to Destroy Background'
 			], 400);
 		}
 	}

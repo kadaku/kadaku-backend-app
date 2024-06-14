@@ -30,6 +30,11 @@ return new class extends Migration
             $table->string('first_event_gmt', 5)->nullable();
             $table->text('first_event_address')->nullable();
 
+            // background custom
+            $table->binary('background_default')->comment('for default background in theme')->nullable();
+            $table->binary('background_custom')->comment('for replace all background in theme')->nullable();
+            $table->binary('background_screen_guest')->comment('for background in screen guest')->nullable();
+
             // music
             $table->unsignedBigInteger('music_id');
             $table->string('music')->nullable();

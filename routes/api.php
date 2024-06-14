@@ -123,6 +123,9 @@ Route::middleware('auth:sanctum')->group(function () {
 				Route::post('/store/image', 'store_image');
 				Route::post('/destroy/image', 'destroy_image');
 				Route::post('/store/cover', 'store_cover');
+				Route::post('/store/background-custom', 'store_background_custom');
+				Route::post('/destroy/background-custom', 'destroy_background_custom');
+				Route::post('/store/background-screen-guest', 'store_background_screen_guest');
 			});
 		});
 	});
