@@ -68,38 +68,38 @@ class ThemesController extends Controller
 			->leftJoin('m_categories', 'm_categories.id', 'm_themes.category_id')
 			->leftJoin('m_themes_type', 'm_themes_type.id', 'm_themes.type_id')
 			->select([
-				'm_themes.id AS theme_id',
-				'm_themes.category_id AS theme_category_id',
-				'm_themes.type_id AS theme_type_id',
-				'm_themes.name AS theme_name',
-				'm_themes.slug AS theme_slug',
-				'm_themes.layout AS theme_layout',
-				'm_themes.description AS theme_description',
-				'm_themes.background AS theme_background',
-				'm_themes.thumbnail AS theme_thumbnail',
-				'm_themes.thumbnail_xs AS theme_thumbnail_xs',
-				'm_themes.price AS theme_price',
-				'm_themes.discount AS theme_discount',
-				'm_themes.is_premium AS theme_is_premium',
-				'm_themes.styles AS theme_styles',
-				'm_themes.version AS theme_version',
-				'm_themes.is_active AS theme_is_active',
-				'm_themes.created_at AS theme_created_at',
-				'm_themes.updated_at AS theme_updated_at',
-				'm_categories.id AS category_id',
-				'm_categories.slug AS category_slug',
-				'm_categories.icon AS category_icon',
-				'm_categories.meta_title AS category_meta_title',
-				'm_categories.meta_description AS category_meta_description',
-				'm_categories.name AS category_name',
-				'm_categories.is_active AS category_is_active',
-				'm_categories.created_at AS category_created_at',
-				'm_categories.updated_at AS category_updated_at',
-				'm_themes_type.id AS theme_type_id',
-				'm_themes_type.name AS theme_type_name',
-				'm_themes_type.is_active AS theme_type_is_active',
-				'm_themes_type.created_at AS theme_type_created_at',
-				'm_themes_type.updated_at AS theme_type_updated_at'
+				'm_themes.id as theme_id',
+				'm_themes.category_id as theme_category_id',
+				'm_themes.type_id as theme_type_id',
+				'm_themes.name as theme_name',
+				'm_themes.slug as theme_slug',
+				'm_themes.layout as theme_layout',
+				'm_themes.description as theme_description',
+				'm_themes.background as theme_background',
+				'm_themes.thumbnail as theme_thumbnail',
+				'm_themes.thumbnail_xs as theme_thumbnail_xs',
+				'm_themes.price as theme_price',
+				'm_themes.discount as theme_discount',
+				'm_themes.is_premium as theme_is_premium',
+				'm_themes.styles as theme_styles',
+				'm_themes.version as theme_version',
+				'm_themes.is_active as theme_is_active',
+				'm_themes.created_at as theme_created_at',
+				'm_themes.updated_at as theme_updated_at',
+				'm_categories.id as category_id',
+				'm_categories.slug as category_slug',
+				'm_categories.icon as category_icon',
+				'm_categories.meta_title as category_meta_title',
+				'm_categories.meta_description as category_meta_description',
+				'm_categories.name as category_name',
+				'm_categories.is_active as category_is_active',
+				'm_categories.created_at as category_created_at',
+				'm_categories.updated_at as category_updated_at',
+				'm_themes_type.id as theme_type_id',
+				'm_themes_type.name as theme_type_name',
+				'm_themes_type.is_active as theme_type_is_active',
+				'm_themes_type.created_at as theme_type_created_at',
+				'm_themes_type.updated_at as theme_type_updated_at'
 			])
 			->where('m_themes.slug', $request->slug)
 			->first();
@@ -120,12 +120,14 @@ class ThemesController extends Controller
 			$theme->components = $components;
 
 			return response()->json([
+				"code" => 200,
 				"status" => true,
 				"message" => 'The master theme components data was found',
 				"data" => $theme
-			]);
+			], 200);
 		endif;
 		return response()->json([
+			"code" => 404,
 			"status" => false,
 			"message" => 'The master theme components data was not found'
 		], 404);
@@ -146,11 +148,13 @@ class ThemesController extends Controller
 
 		if ($newTheme) :
 			return response()->json([
+				"code" => 200,
 				"status" => true,
 				"message" => 'Request success'
-			]);
+			], 200);
 		endif;
 		return response()->json([
+			"code" => 404,
 			"status" => false,
 			"message" => 'Process failed'
 		], 404);

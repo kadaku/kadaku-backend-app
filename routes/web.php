@@ -160,5 +160,35 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		Route::post('/blogs/update-publish', 'BlogsController@update_publish');
 		Route::post('/blogs/store', 'BlogsController@store');
 		Route::delete('/blogs/destroy/{id}', 'BlogsController@destroy');
+
+		/** 
+		 * Masterdata -> Categories Layouts
+		 */
+		Route::get('/categories-layouts', 'CategoriesLayoutsController@index');
+		Route::get('/categories-layouts/list', 'CategoriesLayoutsController@list');
+		Route::get('/categories-layouts/show/{id}', 'CategoriesLayoutsController@show');
+		Route::post('/categories-layouts/update-status', 'CategoriesLayoutsController@update');
+		Route::post('/categories-layouts/store', 'CategoriesLayoutsController@store');
+		Route::delete('/categories-layouts/destroy/{id}', 'CategoriesLayoutsController@destroy');
+		
+		/** 
+		 * Masterdata -> Layouts
+		 */
+		Route::get('/layouts', 'LayoutsController@index');
+		Route::get('/layouts/list', 'LayoutsController@list');
+		Route::get('/layouts/show/{id}', 'LayoutsController@show');
+		Route::post('/layouts/update-status', 'LayoutsController@update');
+		Route::post('/layouts/store', 'LayoutsController@store');
+		Route::delete('/layouts/destroy/{id}', 'LayoutsController@destroy');
+
+		/** 
+		 * Masterdata -> Packages
+		 */
+		Route::get('/packages', 'PackagesController@index');
+		Route::get('/packages/list', 'PackagesController@list');
+		Route::get('/packages/show/{id}', 'PackagesController@show');
+		Route::post('/packages/update-status', 'PackagesController@update');
+		Route::post('/packages/store', 'PackagesController@store');
+		Route::delete('/packages/destroy/{id}', 'PackagesController@destroy');
 	});
 });

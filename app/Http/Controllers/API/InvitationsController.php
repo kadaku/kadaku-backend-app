@@ -21,7 +21,7 @@ class InvitationsController extends Controller
 		parent::__construct();
 		$this->path_cover = 'images/invitations/covers/';	
 		$this->path_background_custom = 'images/invitations/background/customs/';	
-		$this->path_background_screen_guests = 'images/invitations/background/screen_guests/';	
+		$this->path_background_screen_guests = 'images/invitations/background/screen-guests/';	
 	}
 	
 	function check_available_domain(Request $request)
@@ -75,7 +75,10 @@ class InvitationsController extends Controller
 			], 200);
 		}
 
-		if (empty($request->theme_id)) {
+		$valid_create = true;
+
+		if (!isset($_POST['theme_id']) || empty($request->theme_id)) {
+			$valid_create = false;
 			$response = [
 				'code' => 400,
 				'status' => false,
@@ -97,75 +100,83 @@ class InvitationsController extends Controller
 				],
 			], 200);
 		} else {
-			// if not used
-			// data user login
-			$data_customer = Auth::user();
-			if ($data_customer) {
-				// check if trial and not premium account just can create one invitation
-				//!! not yet
-
-				$customer_id = $data_customer->id;
-				$category_id = $request->category_id;
-				$theme_id = $request->theme_id;
-
-				$data_categories = DB::table('m_categories')->where('id', '=', $category_id)->first();
-
-				$data = [
-					'customer_id' => $customer_id,
-					'category_id' => $category_id,
-					'theme_id' => $theme_id,
-					'domain' => $domain,
-					'heading' => $data_categories->meta_title,
-					'introduction' => $data_categories->meta_description,
-				];
-
-				$invitation = InvitationsModel::create($data);
-				if ($invitation) {
-					$theme_component = DB::table('m_theme_components')->where('theme_id', $theme_id)->get();
-					if ($theme_component) {
-						$data_theme_component = [];
-						foreach ($theme_component as $key => $value) {
-							$data_theme_component[] = [
-								'theme_id' => $theme_id,
-								'invitation_id' => $invitation->id,
-								'customer_id' => $customer_id,
-								'name' => $value->name,
-								'type' => $value->type,
-								'ref' => $value->ref,
-								'order' => $value->order,
-								'props' => $value->props,
-								'icon' => $value->icon,
-								'is_icon' => $value->is_icon,
-								'thumbnail' => $value->thumbnail,
-								'is_premium' => $value->is_premium,
-								'is_active' => $value->is_active,
-								'is_fixed' => $value->is_fixed,
-								'is_always_on' => $value->is_always_on,
-							];
+			if ($valid_create) {
+				// if not used
+				// data user login
+				$data_customer = Auth::user();
+				if ($data_customer) {
+					// check if trial and not premium account just can create one invitation
+					//!! not yet
+	
+					$customer_id = $data_customer->id;
+					$category_id = $request->category_id;
+					$theme_id = $request->theme_id;
+	
+					$data_categories = DB::table('m_categories')->where('id', '=', $category_id)->first();
+	
+					$data = [
+						'customer_id' => $customer_id,
+						'category_id' => $category_id,
+						'theme_id' => $theme_id,
+						'domain' => $domain,
+						'heading' => $data_categories->meta_title,
+						'introduction' => $data_categories->meta_description,
+					];
+	
+					$invitation = InvitationsModel::create($data);
+					if ($invitation) {
+						$theme_component = DB::table('m_theme_components')->where('theme_id', $theme_id)->get();
+						if ($theme_component) {
+							$data_theme_component = [];
+							foreach ($theme_component as $key => $value) {
+								$data_theme_component[] = [
+									'theme_id' => $theme_id,
+									'invitation_id' => $invitation->id,
+									'customer_id' => $customer_id,
+									'name' => $value->name,
+									'type' => $value->type,
+									'ref' => $value->ref,
+									'order' => $value->order,
+									'props' => $value->props,
+									'icon' => $value->icon,
+									'is_icon' => $value->is_icon,
+									'thumbnail' => $value->thumbnail,
+									'is_premium' => $value->is_premium,
+									'is_active' => $value->is_active,
+									'is_fixed' => $value->is_fixed,
+									'is_always_on' => $value->is_always_on,
+								];
+							}
+							DB::table('t_theme_components')->insert($data_theme_component);
 						}
-						DB::table('t_theme_components')->insert($data_theme_component);
+	
+						return response()->json([
+							'code' => 200,
+							'status' => true,
+							'message' => 'Successfully Created an Invitation Card',
+							'data' => [
+								'invitation_id' => $invitation->id,
+							]
+						], 200);
+					} else {
+						return response()->json([
+							'code' => 400,
+							'status' => false,
+							'message' => 'Failed to Ceate Invitation Card',
+						], 200);
 					}
-
-					return response()->json([
-						'code' => 200,
-						'status' => true,
-						'message' => 'Successfully created an invitation card',
-						'data' => [
-							'invitation_id' => $invitation->id,
-						]
-					], 200);
 				} else {
 					return response()->json([
 						'code' => 400,
 						'status' => false,
-						'message' => 'Failed to create invitation card',
+						'message' => 'Forbidden Access',
 					], 200);
 				}
 			} else {
 				return response()->json([
 					'code' => 400,
 					'status' => false,
-					'message' => 'Forbidden Access',
+					'message' => 'Not Valid to Create',
 				], 200);
 			}
 		}
@@ -218,11 +229,16 @@ class InvitationsController extends Controller
 
 		$data_customer = Auth::user();
 		$data = InvitationsModel::where('id', '=', $id)->where('customer_id', $data_customer->id)->first();
-		if (!$data) {
-			return $this->get_by_domain($id);
-		}
-
 		if ($data) {
+			if ($data->is_active == 0) {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Your Invitation Card Is Not Active',
+					'data' => [],
+				], 200);
+			}
+
 			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
 			}
@@ -307,6 +323,15 @@ class InvitationsController extends Controller
 		$data_customer = Auth::user();
 		$data = InvitationsModel::where('id', '=', $id)->where('customer_id', $data_customer->id)->first();
 		if ($data) {
+			if ($data->is_active == 0) {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Your Invitation Card Is Not Active',
+					'data' => [],
+				], 400);
+			}
+
 			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
 			}
@@ -396,6 +421,15 @@ class InvitationsController extends Controller
 		}
 		$data = InvitationsModel::where('domain', '=', $domain)->first();
 		if ($data) {
+			if ($data->is_active == 0) {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Your Invitation Card Is Not Active',
+					'data' => [],
+				], 200);
+			}
+
 			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
 			}
@@ -904,6 +938,99 @@ class InvitationsController extends Controller
 				'code' => 400,
 				'status' => false,
 				'message' => 'Not Authorized to Destroy Background'
+			], 400);
+		}
+	}
+
+	function store_background_screen_guests(Request $request)
+	{
+		$update = false;
+		$url_background_screen_guests = null;
+		if (DB::table('t_invitations')->where('id', $request->invitation_id)->exists()) {
+			// upload photo
+			if ($request->file('background_screen_guests')) {
+				// remove the old avatar if it exists
+				$file_old = DB::table('t_invitations')->select(['background_screen_guests'])->where('id', $request->invitation_id)->first();
+				if ($file_old && Storage::disk('public')->exists($this->path_background_screen_guests.$file_old->background_screen_guests)) {
+					Storage::disk('public')->delete($this->path_background_screen_guests.$file_old->background_screen_guests);
+				}
+				$file = $request->file('background_screen_guests');
+				$file_ext = 'webp';
+				$file_name = 'inv-bg-screen-guests-'.$request->invitation_id.'-'.time().'-'.sha1($request->invitation_id);
+				$file_name_fix = $file_name.'.'.$file_ext;
+				$webp_image = $this->convert_to_webp($file->getPathname());
+				
+				Storage::disk('public')->put($this->path_background_screen_guests.$file_name_fix, $webp_image);
+				$data['background_screen_guests'] = $file_name_fix;
+				$update = DB::table('t_invitations')
+				->where('id', $request->invitation_id)
+				->where('customer_id', Auth::user()->id)
+				->update($data);
+			
+				if (Storage::disk('public')->exists($this->path_background_screen_guests.$file_name_fix)) {
+					$url_background_screen_guests = asset('storage/'.$this->path_background_screen_guests.$file_name_fix);
+				}
+			}
+			// end upload photo
+
+			if ($update) {
+				return response()->json([
+					'code' => 200,
+					'status' => true,
+					'message' => 'Successfully Upload Background Screen Guets',
+					'data' => [
+						'background_screen_guests' => $url_background_screen_guests,
+					]
+				], 200);
+			} else {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Failed Upload Background Screen Guets'
+				], 400);	
+			}
+		} else {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Not Authorized to Store Background Screen Guets'
+			], 400);
+		}
+	}
+
+	function destroy_background_screen_guests(Request $request)
+	{
+		$update = false;
+		if (DB::table('t_invitations')->where('id', $request->invitation_id)->exists()) {
+			$file_old = DB::table('t_invitations')->select(['background_screen_guests'])->where('id', $request->invitation_id)->first();
+
+			$update = DB::table('t_invitations')
+				->where('id', $request->invitation_id)
+				->where('customer_id', Auth::user()->id)
+				->update(['background_screen_guests' => NULL]);
+
+			if ($file_old && Storage::disk('public')->exists($this->path_background_screen_guests.$file_old->background_screen_guests)) {
+				Storage::disk('public')->delete($this->path_background_screen_guests.$file_old->background_screen_guests);
+			}
+
+			if ($update) {
+				return response()->json([
+					'code' => 200,
+					'status' => true,
+					'message' => 'Successfully Destroy Background Screen Guets',
+				], 200);
+			} else {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Failed Destroy Background Screen Guets'
+				], 400);	
+			}
+		} else {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Not Authorized to Destroy Background Screen Guets'
 			], 400);
 		}
 	}

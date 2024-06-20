@@ -1,15 +1,19 @@
 <!doctype html>
-<html lang="en" 
+<html
+    lang="en" 
     data-layout="vertical" 
     data-layout-style="detached" 
     {{-- data-layout-style="default"  --}}
+    data-layout-mode="light" 
     data-sidebar="dark" 
     data-topbar="dark"
     data-sidebar-size="lg" 
     data-sidebar-image="img-2" 
-    data-preloader="disable">
+    data-preloader="disable"
+    data-layout-position="fixed" 
+    data-layout-width="fluid
+">
 <head>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="title" content="{{ brand()->name }}">
@@ -38,6 +42,7 @@
     <link href="{{ asset('extend/css/fancybox.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('extend/plugins/toastr/toastr.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('extend/plugins/fontawesome-6.5.2-web/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('extend/css/sweetalert2-dark.css') }}" rel="stylesheet" type="text/css">
 
     <script src="{{ asset('main/js/jquery-3.6.3.min.js') }}"></script>
     <script src="{{ asset('main/js/layout.js') }}"></script>
@@ -74,7 +79,7 @@
                 } else {
                     useDarkMode = false;
                 }
-                // tinymce.remove();
+                tinymce.remove();
                 if ($('#content').is(':visible')) {
                     tinymcePlugin('#content', useDarkMode);
                 }
@@ -113,7 +118,7 @@
 
         function tinymcePlugin(element, darkMode) {
             if (sessionStorage.getItem("data-layout-mode") == 'dark') {
-                var darkMode = true;
+                darkMode = true;
             }
 
             var fontSurat = 'Arial';

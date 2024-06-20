@@ -6,6 +6,7 @@ use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\CategoriesController;
 use App\Http\Controllers\API\CouponsController;
 use App\Http\Controllers\API\InvitationsController;
+use App\Http\Controllers\API\LayoutsController;
 use App\Http\Controllers\API\MasterdataController;
 use App\Http\Controllers\API\MusicsController;
 use App\Http\Controllers\API\RegionsController;
@@ -125,7 +126,8 @@ Route::middleware('auth:sanctum')->group(function () {
 				Route::post('/store/cover', 'store_cover');
 				Route::post('/store/background-custom', 'store_background_custom');
 				Route::post('/destroy/background-custom', 'destroy_background_custom');
-				Route::post('/store/background-screen-guest', 'store_background_screen_guest');
+				Route::post('/store/background-screen-guests', 'store_background_screen_guests');
+				Route::post('/destroy/background-screen-guests', 'destroy_background_screen_guests');
 			});
 		});
 	});
@@ -142,6 +144,12 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::controller(MusicsController::class)->group(function () {
 		Route::get('/categories-musics', 'list_categories_musics');
 		Route::get('/musics', 'list_musics');
+	});
+
+	// LAYOUTS
+	Route::controller(LayoutsController::class)->group(function () {
+		Route::get('/categories-layouts', 'list_categories_layouts');
+		Route::get('/layouts', 'list_layouts');
 	});
 });
 

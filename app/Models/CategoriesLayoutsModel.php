@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class CategoriesMusicsModel extends Model
+class CategoriesLayoutsModel extends Model
 {
-  use HasFactory;
+	use HasFactory;
 
-  protected $table = "m_categories_musics";
-	protected $fillable = ["name", "slug", "is_active"];
+	protected $table = "m_categories_layouts";
+	protected $fillable = ["name", "is_active"];
 
 	function _query($start, $limit, $search)
 	{

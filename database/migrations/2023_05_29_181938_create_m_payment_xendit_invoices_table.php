@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('invoice_id')->unique('invoice_id');
             $table->string('external_id')->unique('external_id');
             $table->string('user_id');
+            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('invitation_id');
             $table->boolean('is_high')->default(false);
             $table->string('status');
             $table->string('merchant_name');

@@ -30,7 +30,7 @@ class BlogsModel extends Model
 		"deleted_date",
 		"deleted_by",
 		"created_by",
-		"modiified_by",
+		"modified_by",
 	];
 
 	function _query($start, $limit, $search)
