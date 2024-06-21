@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ThemesController extends Controller
 {
@@ -39,6 +40,21 @@ class ThemesController extends Controller
 					$total_discount = ($discount / 100) * $price;
 					$total = $price - $total_discount;
 					$data[$i]->total = $total;
+				}
+
+				$path_thumbnail = 'images/themes/thumbnails/';
+				$path_background = 'images/themes/backgrounds/';
+				// $data[$i]->background = NULL;
+				if ($value->background && Storage::disk('public')->exists($path_background . $value->background)) {
+					$data[$i]->background = asset('storage/' . $path_background . $value->background);
+				}
+				// $data[$i]->thumbnail = NULL;
+				if ($value->thumbnail && Storage::disk('public')->exists($path_thumbnail . $value->thumbnail)) {
+					$data[$i]->thumbnail = asset('storage/' . $path_thumbnail . $value->thumbnail);
+				}
+				// $data[$i]->thumbnail_xs = NULL;
+				if ($value->thumbnail_xs && Storage::disk('public')->exists($path_thumbnail . $value->thumbnail_xs)) {
+					$data[$i]->thumbnail_xs = asset('storage/' . $path_thumbnail . $value->thumbnail_xs);
 				}
 			}
 
@@ -135,9 +151,7 @@ class ThemesController extends Controller
 
 	public function updateComponent(Request $request)
 	{
-
 		$value = $request->field == "props" ? json_encode($request->value) : $request->value;
-
 		$newTheme = DB::table('m_theme_components')
 			->where('theme_id', $request->theme_id)
 			->where('name', $request->name)

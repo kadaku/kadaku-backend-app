@@ -45,7 +45,21 @@ class XenditController extends Controller
 			], 406);
 		endif;
 
-		$external_id = 'invoice-kadaku-premium-' . Str::random(10) . '-' . Auth::user()->id . '-' . time();
+		$pay_method = strtoupper($request->pay_method);
+		// CHECK BANK ACCOUNTS / PAYMENT CHANNEL
+		$payment_channel = $request->payment_channel;
+		if (empty($payment_channel)) {
+			return response()->json([
+				"status" => false,
+				"message" => 'Please choose a payment channel'
+			], 409);
+		}
+
+		$payment_channel = DB::table('m_bank_accounts')->where('id', '=', $payment_channel)->first();
+		// END CHECK BANK ACCOUNTS / PAYMENT CHANNEL
+
+		$external_id = 'INV/KADAKU/' . date('YmdHis') . '/PREMIUM/' . Auth::user()->id . '/' . strtoupper(Str::random(10));
+		$external_id_hash = sha1($external_id);
 
 		if ($request->products < 1) :
 			return response()->json([
@@ -57,6 +71,9 @@ class XenditController extends Controller
 		$amount = 0;
 
 		// PRODUCTS
+		$addons = array();
+		$packages = array();
+
 		$items = array();
 		foreach ($request->products as $product) {
 			switch ($product['category']) {
@@ -64,8 +81,13 @@ class XenditController extends Controller
 					$addon = DB::table('m_addons')->select('*')->where('id', $product['id'])->first();
 					if ($addon) {
 						$total = ($addon->price - ($addon->price * ($addon->discount / 100))) * $product['quantity'];
+
+						// for payment detail
+						$data_addon = $addon;
+						$data_addon->total = $total;
+						$addons[] = $data_addon;
+
 						$items[] = [
-							'id' => $addon->id,
 							'name' => $addon->name,
 							'price' => $total,
 							'quantity' => $product['quantity'],
@@ -88,8 +110,13 @@ class XenditController extends Controller
 					$package = DB::table('m_packages')->select('*')->where('id', $product['id'])->first();
 					if ($package) {
 						$total = ($package->price - ($package->price * ($package->discount / 100))) * $product['quantity'];
+
+						// for payment detail
+						$data_package = $package;
+						$data_package->total = $total;
+						$packages[] = $data_package;
+
 						$items[] = [
-							'id' => $package->id,
 							'name' => $package->name,
 							'price' => $total,
 							'quantity' => $product['quantity'],
@@ -118,6 +145,7 @@ class XenditController extends Controller
 		}
 
 		// FEES
+		$coupons = array();
 		$fees = array();
 		foreach ($request->fees as $fee) {
 			switch ($fee['type']) {
@@ -125,6 +153,12 @@ class XenditController extends Controller
 					$coupon = DB::table('m_coupons')->select('*')->where('id', $fee['id'])->where('minimum_amount', '<=', $amount)->first();
 					if ($coupon) {
 						$total = -$coupon->amount;
+
+						// for payment detail
+						$data_coupon = $coupon;
+						$data_coupon->total = $total;
+						$coupons[] = $data_coupon;
+
 						$fees[] = [
 							'type' => $fee['type'],
 							'value' => $total
@@ -172,19 +206,22 @@ class XenditController extends Controller
 			], 403);
 		endif;
 
+		$customer = DB::table('m_customers')->select('id', 'name', 'email', 'email_verified_at', 'phone_code', 'phone_dial_code', 'phone', 'address')->where('id', '=', Auth::user()->id)->first();
+
 		$payload = [
 			"external_id" => $external_id,
 			"payer_email" => Auth::user()->email,
 			"items" => $items,
 			"fees" => $fees,
 			"description" => 'Invoice checkout from Kadaku for premium account subscription',
-			"success_redirect_url" => $this->base_url . '/feedback?id=' . $external_id . '&status=success',
-			"failure_redirect_url" => $this->base_url . '/feedback?id=' . $external_id . '&status=failure',
+			"success_redirect_url" => $this->base_url . '/account/invoice/'.$external_id_hash.'?id=' . $external_id . '&status=success',
+			"failure_redirect_url" => $this->base_url . '/account/invoice/'.$external_id_hash.'?id=' . $external_id . '&status=failure',
 			"amount" => $amount,
 			"paid_amount" => $amount,
-			// 'payment_methods' => [ /* allowed payment methods */
-			//     'BCA', 'QRIS', 'BNI'
-			// ]
+			'payment_methods' => [ /* allowed payment methods */
+			  // 'BCA', 'QRIS', 'BNI'
+				$payment_channel->code, // FROM DATABASE
+			]
 		];
 
 		try {
@@ -202,7 +239,7 @@ class XenditController extends Controller
 					], 400);
 				}
 
-				$isExist = DB::table('t_payment_xendit_invoices')
+				$isExist = DB::table('t_payment_invoices')
 					->where('invoice_id', $response->id)
 					->where('external_id', $response->external_id)
 					// ->where('payment_id', $payload['payment_id']) /*  Currently this object will only be returned when payment method that payer use are eWallets, PayLater, and QR code */
@@ -213,6 +250,7 @@ class XenditController extends Controller
 						"invoice_id" => $response->id,
 						"external_id" => $response->external_id,
 						"user_id" => isset($response->user_id) ? $response->user_id : NULL,
+						"customer_id" => isset(Auth::user()->id) ? Auth::user()->id : NULL,
 						"status" => isset($response->status) ? $response->status : NULL,
 						"merchant_name" => isset($response->merchant_name) ? $response->merchant_name : NULL,
 						"amount" => isset($response->amount) ? $response->amount : NULL,
@@ -225,11 +263,18 @@ class XenditController extends Controller
 						"created" => isset($response->created) ? $response->created : NULL,
 						"updated" => isset($response->updated) ? $response->updated : NULL,
 						"currency" => isset($response->currency) ? $response->currency : NULL,
-						"items" => isset($response->items) ? json_encode($response->items) : '[]',
+						"items" => isset($response->items) ? json_encode($response->items) : NULL,
+						"fees" => isset($response->fees) ? json_encode($response->fees) : NULL,
 						"reminder_date" => isset($response->reminder_date) ? $response->reminder_date : Carbon::now()->addDay()->format('Y-m-d\TH:i:s.v\Z'),
+						"payment_partners" => 'XENDIT',
+						"payment_method_invoice" => isset($pay_method) ? $pay_method : NULL,
+						"packages" => isset($packages) ? json_encode($packages) : NULL,
+						"addons" => isset($addons) ? json_encode($addons) : NULL,
+						"coupons" => isset($coupons) ? json_encode($coupons) : NULL,
+						"customer" => isset($customer) ? json_encode($customer) : NULL,
 					];
 
-					$store = DB::table('t_payment_xendit_invoices')
+					$store = DB::table('t_payment_invoices')
 						->insert($params);
 
 					if ($store) :
@@ -237,7 +282,7 @@ class XenditController extends Controller
 							"status" => true,
 							"message" => 'Success store invoice Xendit',
 							"data" => [
-								'url' => $params['invoice_url']
+								'id' => $params['invoice_id']
 							]
 						]);
 					endif;
@@ -279,7 +324,6 @@ class XenditController extends Controller
 	public function invoice_callback(Request $request)
 	{
 		$payload = $request->all();
-
 		try {
 			$request_valid = Http::withHeaders([
 				'Authorization' => $this->secret_key
@@ -294,15 +338,15 @@ class XenditController extends Controller
 			}
 
 			// split the string by '-' delimiter
-			$parts = explode('-', $response->external_id);
+			$parts = explode('/', $response->external_id);
 			// extract the Auth::user()->id from the parts array
 			$userId = $parts[count($parts) - 2];
 			// extract the context of payment from the parts array
-			$context = $parts[count($parts) - 4];
+			$context = $parts[count($parts) - 3];
 
 			if ($response) :
 				// Premium Account Payment Handler
-				if ($context == 'premium') {
+				if ($context == 'PREMIUM') {
 					$params = [
 						"invoice_id" => isset($response->id) ? $response->id : NULL,
 						"external_id" => isset($response->external_id) ? $response->external_id : NULL,
@@ -337,13 +381,13 @@ class XenditController extends Controller
 						"recurring_payment_id" => isset($payload['recurring_payment_id']) ? $payload['recurring_payment_id'] : NULL,
 					];
 
-					$isExist = DB::table('t_payment_xendit_invoices')
+					$isExist = DB::table('t_payment_invoices')
 						->where('invoice_id', $response->id)
 						->where('external_id', $response->external_id)
 						->exists();
 
 					if ($isExist) {
-						$existedInvoice = DB::table('t_payment_xendit_invoices')
+						$existedInvoice = DB::table('t_payment_invoices')
 							->where('invoice_id', $response->id)
 							->where('external_id', $response->external_id)
 							->first();
@@ -354,7 +398,7 @@ class XenditController extends Controller
 							]);
 						endif;
 
-						$update = DB::table('t_payment_xendit_invoices')
+						$update = DB::table('t_payment_invoices')
 							->where('invoice_id', $response->id)
 							->where('external_id', $response->external_id)
 							->update($params);
@@ -374,7 +418,7 @@ class XenditController extends Controller
 								// extract days from package data
 								$days = 1;
 								if ($package_item !== null) {
-									$pack = DB::table('m_packages')->select('valid_days')->where('name', $package_item->name)->first();
+									$pack = DB::table('m_packages')->select('valid_days')->where('id', $package_item->id)->first();
 									if ($pack) {
 										$days = $pack->valid_days;
 									}

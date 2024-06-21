@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BankAccountsController;
 use App\Http\Controllers\API\BlogsController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\CategoriesController;
 use App\Http\Controllers\API\CouponsController;
 use App\Http\Controllers\API\InvitationsController;
+use App\Http\Controllers\API\InvoiceController;
 use App\Http\Controllers\API\LayoutsController;
 use App\Http\Controllers\API\MasterdataController;
 use App\Http\Controllers\API\MusicsController;
@@ -111,6 +113,14 @@ Route::middleware('auth:sanctum')->group(function () {
 		});
 	});
 
+	// INVOICE
+	Route::controller(InvoiceController::class)->group(function () {
+		Route::prefix('/invoice')->group(function () {
+			Route::get('/', 'list');
+			Route::get('/{id}', 'show');
+		});
+	});
+
 	Route::middleware(['ensure.premium.account'])->group(function () {
 		// INVITATIONS
 		Route::controller(InvitationsController::class)->group(function () {
@@ -150,6 +160,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::controller(LayoutsController::class)->group(function () {
 		Route::get('/categories-layouts', 'list_categories_layouts');
 		Route::get('/layouts', 'list_layouts');
+	});
+
+	// BANK ACCOUNTS
+	Route::controller(BankAccountsController::class)->group(function () {
+		Route::get('/bank-accounts', 'list');
 	});
 });
 

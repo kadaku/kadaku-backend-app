@@ -32,6 +32,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		 */
 		Route::get('/developer/scraping', 'DevController@scraping');
 		Route::get('/developer/download', 'DevController@download');
+		Route::get('developer/xendit-test/{id}', 'DevController@test_callback_xendit');
 
 		/**
 		 * Logout Routes
@@ -190,5 +191,25 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		Route::post('/packages/update-status', 'PackagesController@update');
 		Route::post('/packages/store', 'PackagesController@store');
 		Route::delete('/packages/destroy/{id}', 'PackagesController@destroy');
+
+		/** 
+		 * Masterdata -> Themes
+		 */
+		Route::get('/themes', 'ThemesController@index');
+		Route::get('/themes/list', 'ThemesController@list');
+		Route::get('/themes/show/{id}', 'ThemesController@show');
+		Route::post('/themes/update-status', 'ThemesController@update');
+		Route::post('/themes/store', 'ThemesController@store');
+		Route::delete('/themes/destroy/{id}', 'ThemesController@destroy');
+		
+		/** 
+		 * Masterdata -> Bank Accounts
+		 */
+		Route::get('/bank-accounts', 'BankAccountsController@index');
+		Route::get('/bank-accounts/list', 'BankAccountsController@list');
+		Route::get('/bank-accounts/show/{id}', 'BankAccountsController@show');
+		Route::post('/bank-accounts/update-status', 'BankAccountsController@update');
+		Route::post('/bank-accounts/store', 'BankAccountsController@store');
+		Route::delete('/bank-accounts/destroy/{id}', 'BankAccountsController@destroy');
 	});
 });

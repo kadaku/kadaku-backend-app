@@ -33,6 +33,8 @@ return new class extends Migration
             $table->string('created');
             $table->string('currency');
             $table->string('paid_at')->nullable();
+            $table->string('payment_partners')->nullable();
+            $table->string('payment_method_invoice')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('payment_channel')->nullable();
             $table->string('payment_destination')->nullable();
@@ -48,6 +50,10 @@ return new class extends Migration
             $table->string('ewallet_type')->nullable();
             $table->string('on_demand_link')->nullable();
             $table->string('recurring_payment_id')->nullable();
+            $table->json('packages')->nullable();
+            $table->json('addons')->nullable();
+            $table->json('coupons')->nullable();
+            $table->json('customer')->nullable();
             $table->timestamps();
         });
     }

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_icons', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::rename('t_payment_xendit_invoices', 't_payment_invoices');
+        Schema::table('t_payment_invoices', function (Blueprint $table) {
+            //
         });
     }
 
@@ -22,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_icons');
+        Schema::table('t_payment_invoices', function (Blueprint $table) {
+            //
+        });
     }
 };

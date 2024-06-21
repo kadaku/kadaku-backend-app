@@ -19,8 +19,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('code');
-            $table->binary('thumbnail')->nullable();
+            $table->string('method');
+            $table->string('account_name')->nullable();
+            $table->string('account_number')->nullable();
+            $table->binary('logo')->nullable();
             $table->tinyInteger('is_invoice')->default(0)->comment('for invoice');
+            $table->tinyInteger('is_digital_envelope')->default(0)->comment('for digital envelope');
             $table->tinyInteger('is_active')->default(1);
             $table->timestamps();
         });
