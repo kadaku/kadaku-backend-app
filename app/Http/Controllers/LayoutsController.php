@@ -49,6 +49,12 @@ class LayoutsController extends Controller
 		$data['limit'] = $limit;
 
 		if ($data['list']) {
+			foreach ($data['list'] as $i => $value) {
+				$data['list'][$i]->url_image = NULL;
+				if ($value->image && Storage::disk('public')->exists($this->path . $value->image)) {
+					$data['list'][$i]->url_image = asset('storage/' . $this->path . $value->image);
+				}
+			}
 			$content = [
 				'code' => 200,
 				'status' => true,
@@ -163,7 +169,13 @@ class LayoutsController extends Controller
 			'icon' => $request->icon,
 			'is_premium' => isset($_POST['is_premium']) ? $request->is_premium : 0,
 			'body' => $request->body,
+			'order' => isset($_POST['order']) ? $request->order : 1,
 		];
+
+		$directory_path = public_path($this->path);
+		if (!Storage::disk('public')->exists($directory_path)) {
+			Storage::disk('public')->makeDirectory($directory_path, 777, true);
+		}
 
 		// upload photo
 		if ($request->file('image')) {
@@ -174,7 +186,7 @@ class LayoutsController extends Controller
 			$file = $request->file('image');
 			$file_ext = 'webp';
 			$file_name = $slug;
-			$file_name_fix = 'layouts-' . $file_name . '.' . $file_ext;
+			$file_name_fix = $file_name . '.' . $file_ext;
 			$webp_image = $this->convert_to_webp($file->getPathname());
 
 			Storage::disk('public')->put($this->path . $file_name_fix, $webp_image);
@@ -189,6 +201,9 @@ class LayoutsController extends Controller
 					'code' => 200,
 					'status' => true,
 					'message' => $this->message_add_success,
+					'data' => [
+						'id' => $output->lastInsertId(),
+					]
 				];
 				return response()->json($content, 200);
 			} else {
@@ -206,6 +221,9 @@ class LayoutsController extends Controller
 					'code' => 200,
 					'status' => true,
 					'message' => $this->message_update_success,
+					'data' => [
+						'id' => $request->id,
+					]
 				];
 				return response()->json($content, 200);
 			} else {

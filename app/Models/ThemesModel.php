@@ -21,9 +21,11 @@ class ThemesModel extends Model
 			"a.*",
 			"b.name as category",
 			"c.name as type",
+			"d.name as music"
 		);
 		$query->join("m_categories as b", "b.id", "=", "a.category_id");
 		$query->join("m_themes_type as c", "c.id", "=", "a.type_id");
+		$query->join("m_musics as d", "d.id", "=", "a.music_id", "left");
 		$query->orderBy("a.id", "asc");
 		// condition
 		$keyword = isset($search["keyword"]) && $search["keyword"] !== "" ? $search["keyword"] : NULL;
@@ -34,24 +36,6 @@ class ThemesModel extends Model
 		}
 		if ($limit !== 0) $query->offset($start)->limit($limit);
 		$data = $query->get();
-		if ($data) {
-			foreach ($data as $i => $value) {
-				$path_thumbnail = 'images/themes/thumbnails/';
-				$path_background = 'images/themes/backgrounds/';
-				$data[$i]->url_background = NULL;
-				if ($value->background && Storage::disk('public')->exists($path_background . $value->background)) {
-					$data[$i]->url_background = asset('storage/' . $path_background . $value->background);
-				}
-				$data[$i]->url_thumbnail = NULL;
-				if ($value->thumbnail && Storage::disk('public')->exists($path_thumbnail . $value->thumbnail)) {
-					$data[$i]->url_thumbnail = asset('storage/' . $path_thumbnail . $value->thumbnail);
-				}
-				$data[$i]->url_thumbnail_xs = NULL;
-				if ($value->thumbnail_xs && Storage::disk('public')->exists($path_thumbnail . $value->thumbnail_xs)) {
-					$data[$i]->url_thumbnail_xs = asset('storage/' . $path_thumbnail . $value->thumbnail_xs);
-				}
-			}
-		}
 		return $data;
 	}
 

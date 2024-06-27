@@ -20,6 +20,7 @@ class InvitationsController extends Controller
 	{
 		parent::__construct();
 		$this->path_cover = 'images/invitations/covers/';	
+		$this->path_cover = 'images/invitations/covers/';	
 		$this->path_background_custom = 'images/invitations/background/customs/';	
 		$this->path_background_screen_guests = 'images/invitations/background/screen-guests/';	
 	}
@@ -187,10 +188,18 @@ class InvitationsController extends Controller
 		$data_customer = Auth::user();
 		$data = InvitationsModel::where('customer_id', $data_customer->id)
 			->when($request->q, fn ($query, $search) => $query->where('heading', 'like', '%' . $search . '%')->orWhere('domain', 'like', '%' . $search . '%'))
+			// ->orderBy('is_active', 'desc')
 			->orderBy('id', 'desc')
 			->paginate(20);
 		if ($data) {
 			foreach ($data as $i => $value) {
+				$path_thumbnail = 'images/themes/thumbnails/';
+				$theme = DB::table('m_themes')->select('thumbnail_xs')->where('id', '=', $value->theme_id)->first();
+				$data[$i]->thumbnail = '';
+				if ($theme->thumbnail_xs && Storage::disk('public')->exists($path_thumbnail . $theme->thumbnail_xs)) {
+					$data[$i]->thumbnail = asset('storage/' . $path_thumbnail . $theme->thumbnail_xs);
+				}
+
 				if ($value->cover && Storage::disk('public')->exists($this->path_cover.$value->cover)) {
 					$data[$i]->cover = asset('storage/'.$this->path_cover.$value->cover);
 				}
@@ -323,15 +332,6 @@ class InvitationsController extends Controller
 		$data_customer = Auth::user();
 		$data = InvitationsModel::where('id', '=', $id)->where('customer_id', $data_customer->id)->first();
 		if ($data) {
-			if ($data->is_active == 0) {
-				return response()->json([
-					'code' => 400,
-					'status' => false,
-					'message' => 'Your Invitation Card Is Not Active',
-					'data' => [],
-				], 400);
-			}
-
 			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
 				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
 			}
@@ -391,6 +391,10 @@ class InvitationsController extends Controller
 				->where('tc.theme_id', $data_theme->theme_id)
 				->where('tc.invitation_id', $id)
 				->where('tc.customer_id', $data_customer->id)
+				// except type extras and welcome, footer for edit
+				->where('tc.type', '!=', 'extras')
+				->where(DB::raw('LOWER(tc.name)'), '!=', 'welcome')
+				->where(DB::raw('LOWER(tc.name)'), '!=', 'footer')
 				->orderBy('tc.order', 'asc')
 				->get();
 			$data->theme->components = $data_theme_component;

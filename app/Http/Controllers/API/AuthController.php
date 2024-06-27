@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\AuthModel;
 use App\Notifications\WelcomeEmailNotification;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail as Mail;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Support\Str;
@@ -234,6 +236,34 @@ class AuthController extends Controller
 	{
 		$data = Auth::user();
 		if ($data) {
+			// if new user login / regiter give one day access
+			if (empty($data->expired_at) && empty($data->expired_at)) {
+				$start_at = Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at);
+				$start_at = $start_at->format('Y-m-d H:i:s');
+				
+				$expired_at = Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at);
+				$expired_at = $expired_at->addDay()->format('Y-m-d H:i:s');
+
+				DB::table('m_customers')->where('id', '=', Auth::user()->id)->update([
+					'start_at' => $start_at,
+					'expired_at' => $expired_at, 
+					'is_trial' => 1,
+					'is_premium' => 1,
+				]);	
+			}
+			
+			// check if user has expired date premium or reseller make 0
+			if (strtotime(date('Y-m-d H:i:s')) > strtotime($data->expired_at)) {
+				$data->is_trial = 1;
+				$data->is_premium = 0;
+				$data->is_reseller = 0;
+				DB::table('m_customers')->where('id', '=', Auth::user()->id)->update([
+					'is_trial' => 1,
+					'is_premium' => 0, 
+					'is_reseller' => 0
+				]);	
+			}
+
 			return response()->json([
 				'code' => 200,
 				'status' => true,
@@ -268,7 +298,8 @@ class AuthController extends Controller
 					'total_withdrawal' => $data->total_withdrawal,
 					'is_subscription' => $data->is_subscription,
 					'start_at' => $data->start_at,
-					'expired_at' => $data->expired_at
+					'expired_at' => $data->expired_at,
+					'created_at' => $data->created_at,
 				]
 			], 200);
 		} else {

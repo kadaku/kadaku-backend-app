@@ -11,6 +11,7 @@ use App\Http\Controllers\API\InvoiceController;
 use App\Http\Controllers\API\LayoutsController;
 use App\Http\Controllers\API\MasterdataController;
 use App\Http\Controllers\API\MusicsController;
+use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\RegionsController;
 use App\Http\Controllers\API\SocialAuthController;
 use App\Http\Controllers\API\ThemesController;
@@ -113,6 +114,16 @@ Route::middleware('auth:sanctum')->group(function () {
 		});
 	});
 
+	Route::controller(PaymentController::class)->group(function () {
+		Route::prefix('/payment')->group(function () {
+			Route::prefix('/manual')->group(function () {
+				Route::prefix('/invoice_checkout')->group(function () {
+					Route::post('/premium_account_activation', 'checkout_invoice_premium_account_activation');
+				});
+			});
+		});
+	});
+
 	// INVOICE
 	Route::controller(InvoiceController::class)->group(function () {
 		Route::prefix('/invoice')->group(function () {
@@ -121,7 +132,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		});
 	});
 
-	Route::middleware(['ensure.premium.account'])->group(function () {
+	// Route::middleware(['ensure.premium.account'])->group(function () {
 		// INVITATIONS
 		Route::controller(InvitationsController::class)->group(function () {
 			Route::prefix('/invitations')->group(function () {
@@ -140,7 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
 				Route::post('/destroy/background-screen-guests', 'destroy_background_screen_guests');
 			});
 		});
-	});
+	// });
 
 	// COUPONS
 	Route::controller(CouponsController::class)->group(function () {

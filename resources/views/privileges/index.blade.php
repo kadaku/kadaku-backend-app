@@ -105,7 +105,7 @@
 			}
 
 			Swal.fire({
-				title: 'Konfirmasi',
+				title: 'Confirmation',
 				text: text,
 				icon: 'question',
 				showCancelButton: true,
@@ -258,7 +258,7 @@
 
 	function deleteData(id, page) {
 		Swal.fire({
-			title: 'Konfirmasi',
+			title: 'Confirmation',
 			text: 'Apakah anda yakin ingin mengapus data ini?',
 			icon: 'question',
 			showCancelButton: true,

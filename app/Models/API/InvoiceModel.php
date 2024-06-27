@@ -5,6 +5,7 @@ namespace App\Models\API;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,6 +20,7 @@ class InvoiceModel extends Model
 		$query->select(
 			"*",
 		);
+		$query->where("a.customer_id", "=", Auth::user()->id);
 		$query->orderBy("a.created_at", "desc");
 		// condition
 		$keyword = isset($search["keyword"]) && $search["keyword"] !== "" ? $search["keyword"] : NULL;
@@ -31,13 +33,29 @@ class InvoiceModel extends Model
 			foreach ($data as $i => $value) {
 				$data[$i]->payment_method_invoice = strtoupper($value->payment_method_invoice);
 			
+				if ($value->created) {
+					$date_created = Carbon::createFromFormat('Y-m-d\TH:i:s.v\Z', $value->created);
+					// convert to desired timezone and format
+					$data[$i]->created = $date_created->setTimezone('Asia/Jakarta')->format('l, d F Y H:i');
+					$data[$i]->created_origin = $date_created->setTimezone('Asia/Jakarta')->format('Y-m-d H:i:s');
+				}
+
 				if ($value->reminder_date) {
 					$date_reminder = Carbon::createFromFormat('Y-m-d\TH:i:s.v\Z', $value->reminder_date);
+					$date_reminder = $date_reminder->copy()->addHours(8);
+
 					// convert to desired timezone and format
 					$data[$i]->reminder_date = $date_reminder->setTimezone('Asia/Jakarta')->format('l, d F Y H:i');
 					$data[$i]->reminder_date_origin = $date_reminder->setTimezone('Asia/Jakarta')->format('Y-m-d H:i:s');
+					
+					$time_now = strtotime(date('Y-m-d H:i:s'));
+					$expired_date = strtotime($data[$i]->reminder_date_origin);
+					if (($time_now > $expired_date) && $data[$i]->status != 'PAID') {
+						$data[$i]->status = 'EXPIRED';
+					}
 				}
-				
+
+
 				if ($value->paid_at) {
 					$date_paid = Carbon::createFromFormat('Y-m-d\TH:i:s.v\Z', $value->paid_at);
 					// convert to desired timezone and format

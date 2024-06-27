@@ -30,8 +30,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		/** 
 		 * Dev
 		 */
-		Route::get('/developer/scraping', 'DevController@scraping');
-		Route::get('/developer/download', 'DevController@download');
+		Route::get('/developer/coba', 'DevController@coba');
 		Route::get('developer/xendit-test/{id}', 'DevController@test_callback_xendit');
 
 		/**
@@ -201,6 +200,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		Route::post('/themes/update-status', 'ThemesController@update');
 		Route::post('/themes/store', 'ThemesController@store');
 		Route::delete('/themes/destroy/{id}', 'ThemesController@destroy');
+		Route::delete('/themes/destroy-image', 'ThemesController@destroy_image');
+		Route::get('/themes/show-components/{id}', 'ThemesController@show_components');
+		Route::post('/themes/store-components', 'ThemesController@store_components');
+		Route::post('/themes/update-components', 'ThemesController@update_components');
+		Route::delete('/themes/destroy-components', 'ThemesController@destroy_components');
+		Route::delete('/themes/destroy-background-components/{id}', 'ThemesController@destroy_background_components');
 		
 		/** 
 		 * Masterdata -> Bank Accounts
@@ -211,5 +216,34 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 		Route::post('/bank-accounts/update-status', 'BankAccountsController@update');
 		Route::post('/bank-accounts/store', 'BankAccountsController@store');
 		Route::delete('/bank-accounts/destroy/{id}', 'BankAccountsController@destroy');
+
+		/** 
+		 * Masterdata -> Asset Media
+		 */
+		Route::get('/asset-media', 'AssetMediaController@index');
+		Route::get('/asset-media/list', 'AssetMediaController@list');
+		Route::get('/asset-media/show/{id}', 'AssetMediaController@show');
+		Route::post('/asset-media/update-status', 'AssetMediaController@update');
+		Route::post('/asset-media/store', 'AssetMediaController@store');
+		Route::delete('/asset-media/destroy/{id}', 'AssetMediaController@destroy');
+		
+		/** 
+		 * Masterdata -> Phospor Icons
+		 */
+		Route::get('/phospor-icon', 'IconsPhosporController@index');
+		Route::get('/phospor-icon/list', 'IconsPhosporController@list');
+		Route::get('/phospor-icon/list-icons', 'IconsPhosporController@list_icons');
+		Route::get('/phospor-icon/show/{id}', 'IconsPhosporController@show');
+		Route::post('/phospor-icon/update-status', 'IconsPhosporController@update');
+		Route::post('/phospor-icon/store', 'IconsPhosporController@store');
+		Route::delete('/phospor-icon/destroy/{id}', 'IconsPhosporController@destroy');
+
+		/** 
+		 * Transaction -> Invoices
+		 */
+		Route::get('/invoices', 'InvoicesController@index');
+		Route::get('/invoices/list', 'InvoicesController@list');
+		Route::get('/invoices/show/{id}', 'InvoicesController@show');
+		Route::post('/invoices/update', 'InvoicesController@update');
 	});
 });

@@ -41,7 +41,6 @@ class BankAccountsController extends Controller
 		$type = isset($search["type"]) && $search["type"] !== "" ? strtolower($search["type"]) : NULL;
 		if ($type == 'auto') {
 			$query->where("a.is_automatic_verification", "=", 1);
-			$query->where("a.is_manual_verification", "=", 0);
 		} else if ($type == 'manual') {
 			$query->where("a.is_manual_verification", "=", 1);
 		}

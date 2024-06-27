@@ -82,6 +82,7 @@ class InvoiceController extends Controller
 			"addons",
 			"coupons",
 			"customer",
+			"bank_accounts",
 			"reminder_date",
 			"paid_at",
 		);
@@ -98,9 +99,17 @@ class InvoiceController extends Controller
 			
 			if ($data->reminder_date) {
 				$date_reminder = Carbon::createFromFormat('Y-m-d\TH:i:s.v\Z', $data->reminder_date);
+				$date_reminder = $date_reminder->copy()->addHours(8);
+				
 				// convert to desired timezone and format
 				$data->reminder_date = $date_reminder->setTimezone('Asia/Jakarta')->format('l, d F Y H:i');
 				$data->reminder_date_origin = $date_reminder->setTimezone('Asia/Jakarta')->format('Y-m-d H:i:s');
+				
+				$time_now = strtotime(date('Y-m-d H:i:s'));
+				$expired_date = strtotime($data->reminder_date_origin);
+				if (($time_now > $expired_date) && $data->status != 'PAID') {
+					$data->status = 'EXPIRED';
+				}
 			}
 			
 			if ($data->paid_at) {
@@ -116,6 +125,7 @@ class InvoiceController extends Controller
 			$data->addons = json_decode($data->addons);
 			$data->coupons = json_decode($data->coupons);
 			$data->customer = json_decode($data->customer);
+			$data->bank_accounts = $data->bank_accounts ? json_decode($data->bank_accounts) : NULL;
 
 			$content = [
 				'code' => 200,

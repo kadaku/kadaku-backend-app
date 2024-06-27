@@ -405,23 +405,13 @@ class XenditController extends Controller
 
 						if ($update) :
 							if ($params['status'] === "PAID" || $params['status'] === "SETTLED") :
-								// Transaction success
-								// get the first 'package' item
-								$package_item = null;
-								foreach ($response->items as $item) {
-									if ($item->category == 'package') {
-										$package_item = $item;
-										break; // stop the loop once the first 'package' item is found
-									}
-								}
-
-								// extract days from package data
+								// transaction success
 								$days = 1;
-								if ($package_item !== null) {
-									$pack = DB::table('m_packages')->select('valid_days')->where('id', $package_item->id)->first();
-									if ($pack) {
-										$days = $pack->valid_days;
-									}
+								if ($existedInvoice->packages !== null) {
+                  $packages = json_decode($existedInvoice->packages);
+                  foreach ($packages as $package) {
+                    $days = $package->valid_days;
+                  }
 								}
 
 								$setPremium = DB::table('m_customers')

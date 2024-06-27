@@ -2,8 +2,8 @@
 <html
     lang="en" 
     data-layout="vertical" 
-    data-layout-style="detached" 
-    {{-- data-layout-style="default"  --}}
+    {{-- data-layout-style="detached"  --}}
+    data-layout-style="default" 
     data-layout-mode="light" 
     data-sidebar="dark" 
     data-topbar="dark"
@@ -43,6 +43,8 @@
     <link href="{{ asset('extend/plugins/toastr/toastr.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('extend/plugins/fontawesome-6.5.2-web/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('extend/css/sweetalert2-dark.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('extend/plugins/select2/css/select2.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('icons/phosphor/fill/style.css') }}" rel="stylesheet" type="text/css">
 
     <script src="{{ asset('main/js/jquery-3.6.3.min.js') }}"></script>
     <script src="{{ asset('main/js/layout.js') }}"></script>
@@ -62,6 +64,7 @@
     <script src="{{ asset('extend/js/syam.min.js') }}"></script>
     <script src="{{ asset('extend/plugins/toastr/toastr.min.js') }}"></script>
     <script src="{{ asset('extend/plugins/tinymce5.5.1/tinymce.min.js') }}"></script>
+    <script src="{{ asset('extend/plugins/select2/js/select2.js') }}"></script>
 
     <script>
         $(function() {

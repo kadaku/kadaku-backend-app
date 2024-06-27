@@ -12,85 +12,85 @@ use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
 {
-    
-    function __construct()
-    {
-        // $this->middleware(['social']);
-    }
-    
-    function redirect($service)
-    {
-        return Socialite::driver($service)->stateless()->redirect();
-    }
 
-    function callback($service)
-    {
-        try {
-            $serviceUser = Socialite::driver($service)->stateless()->user();
-        } catch (Exception $e) {
-            return redirect(env('APP_URL_FRONTEND') . '/auth/social-callback?error=Unable to login using ' . $service . '. Please try again' . '&origin=login');
-        }
+	function __construct()
+	{
+		// $this->middleware(['social']);
+	}
 
-        $email = $serviceUser->getEmail();
-        if ($service != 'google') {
-            $email = $serviceUser->getId() . '@' . $service . '.local';
-        }
+	function redirect($service)
+	{
+		return Socialite::driver($service)->stateless()->redirect();
+	}
 
-        $user = $this->getExistingUser($serviceUser, $email, $service);
-        $newUser = false;
-        if (!$user) {
-            $newUser = true;
-            $param = [
-                'name' => $serviceUser->getName(),
-                'email' => $email,
-                'email_verified_at' => now(),
-                'password' => '',
-                'phone_code' => '',
-                'phone_dial_code' => '',
-                'phone' => '',
-                'avatar' => $serviceUser->getAvatar(),
-                'known_source'=> $service,
-                'is_active' => 1,
-            ];
-            $user = AuthModel::create($param);
-        } else {
-            $param['avatar'] = $serviceUser->getAvatar();
+	function callback($service)
+	{
+		try {
+			$serviceUser = Socialite::driver($service)->stateless()->user();
+		} catch (Exception $e) {
+			return redirect(env('APP_URL_FRONTEND') . '/auth/social-callback?error=Unable to login using ' . $service . '. Please try again' . '&origin=login');
+		}
 
-            if ($user->is_active === 0 && $user->email_verified_at === null) {
-                $param['email_verified_at'] = now();
-                $param['is_active'] = 1;
-            }
+		$email = $serviceUser->getEmail();
+		if ($service != 'google') {
+			$email = $serviceUser->getId() . '@' . $service . '.local';
+		}
 
-            AuthModel::where('id', $user->id)->update($param);
-        }
+		$user = $this->getExistingUser($serviceUser, $email, $service);
+		$newUser = false;
+		if (!$user) {
+			$newUser = true;
+			$param = [
+				'name' => $serviceUser->getName(),
+				'email' => $email,
+				'email_verified_at' => now(),
+				'password' => '',
+				'phone_code' => '',
+				'phone_dial_code' => '',
+				'phone' => '',
+				'avatar' => $serviceUser->getAvatar(),
+				'known_source' => $service,
+				'is_active' => 1,
+			];
+			$user = AuthModel::create($param);
+		} else {
+			$param['avatar'] = $serviceUser->getAvatar();
 
-        if ($this->needToCreateSocial($user, $service)) {
-            $param = [
-                'customer_id' => $user->id,
-                'service_id' => $serviceUser->id,
-                'service_name' => $service,
-            ];
-            CustomerSocialModel::create($param);
-        }
+			if ($user->is_active === 0 && $user->email_verified_at === null) {
+				$param['email_verified_at'] = now();
+				$param['is_active'] = 1;
+			}
 
-        $token = $user->createToken(($newUser ? 'register_token' : 'login_token'), ['*'], now()->addHours(5))->plainTextToken;
-        return redirect(env('APP_URL_FRONTEND') . '/auth/social-callback?token=' . $token . '&origin=' . ($newUser ? 'register' : 'login') . '&name=' . $user->name);
-    }
+			AuthModel::where('id', $user->id)->update($param);
+		}
 
-    function needToCreateSocial(AuthModel $user, $service)
-    {
-        return !$user->hasSocialLinked($service);
-    }
+		if ($this->needToCreateSocial($user, $service)) {
+			$param = [
+				'customer_id' => $user->id,
+				'service_id' => $serviceUser->id,
+				'service_name' => $service,
+			];
+			CustomerSocialModel::create($param);
+		}
 
-    function getExistingUser($serviceUser, $email, $service)
-    {
-        if ($service == 'google') {
-            return AuthModel::where('email', $email)->orWhereHas('social', function($q) use ($serviceUser, $service) {
-                $q->where('service_id', $serviceUser->getId())->where('service_name', $service);
-            })->first();
-        } else {
-            $userSocial = CustomerSocialModel::where('service_id', $serviceUser->getId())->first();
-            return $userSocial ? $userSocial->user : null;
-        }
-    }
+		$token = $user->createToken(($newUser ? 'register_token' : 'login_token'), ['*'], now()->addHours(5))->plainTextToken;
+		return redirect(env('APP_URL_FRONTEND') . '/auth/social-callback?token=' . $token . '&origin=' . ($newUser ? 'register' : 'login') . '&name=' . $user->name);
+	}
+
+	function needToCreateSocial(AuthModel $user, $service)
+	{
+		return !$user->hasSocialLinked($service);
+	}
+
+	function getExistingUser($serviceUser, $email, $service)
+	{
+		if ($service == 'google') {
+			return AuthModel::where('email', $email)->orWhereHas('social', function ($q) use ($serviceUser, $service) {
+				$q->where('service_id', $serviceUser->getId())->where('service_name', $service);
+			})->first();
+		} else {
+			$userSocial = CustomerSocialModel::where('service_id', $serviceUser->getId())->first();
+			return $userSocial ? $userSocial->user : null;
+		}
+	}
 }

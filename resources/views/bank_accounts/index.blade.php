@@ -219,7 +219,7 @@
 			}
 
 			Swal.fire({
-				title: 'Konfirmasi',
+				title: 'Confirmation',
 				text: text,
 				icon: 'question',
 				showCancelButton: true,
@@ -327,11 +327,11 @@
 
 					var html = '<tr>' +
 						'<td class="center">' + no + '</td>' +
-						'<td>' + v.name + '</td>' +
-						'<td>' + v.code + '</td>' +
-						'<td>' + v.method + '</td>' +
+						'<td class="nowrap">' + v.name + '</td>' +
+						'<td class="nowrap">' + v.code + '</td>' +
+						'<td class="nowrap">' + v.method + '</td>' +
 						'<td class="nowrap">' + (v.account_name != null ? v.account_name : '') + '</td>' +
-						'<td>' + (v.account_number != null ? v.account_number : '') + '</td>' +
+						'<td class="nowrap">' + (v.account_number != null ? v.account_number : '') + '</td>' +
 						'<td class="center nowrap">' + logo + '</td>' +
 						'<td class="center">' + (v.is_invoice == 1 ? '<i class="fas fa-check"></i>' : '') + '</td>' +
 						'<td class="center">' + (v.is_digital_envelope == 1 ? '<i class="fas fa-check"></i>' : '') + '</td>' +

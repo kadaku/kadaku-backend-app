@@ -125,7 +125,7 @@
 			}
 
 			Swal.fire({
-				title: 'Konfirmasi',
+				title: 'Confirmation',
 				text: text,
 				icon: 'question',
 				showCancelButton: true,
