@@ -15,6 +15,7 @@ class AssetMediaModel extends Model
 		"name",
 		"description",
 		"keyword",
+		"category",
 		"file",
 		"is_active",
 	];
@@ -28,8 +29,12 @@ class AssetMediaModel extends Model
 		$query->orderBy("a.created_at", "desc");
 		// condition
 		$keyword = isset($search["keyword"]) && $search["keyword"] !== "" ? $search["keyword"] : NULL;
+		$category = isset($search["category"]) && $search["category"] !== "" ? $search["category"] : NULL;
 		if ($keyword) {
 			$query->where("a.name", "like", "%$keyword%");
+		}
+		if ($category) {
+			$query->where("a.category", "like", "%$category%");
 		}
 		if ($limit !== 0) $query->offset($start)->limit($limit);
 		$data = $query->get();

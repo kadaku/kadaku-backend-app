@@ -26,7 +26,7 @@
 								<th class="center" width="5%">No.</th>
 								<th width="35%">Name</th>
 								<th width="20%">Description</th>
-								<th width="20%">Keyword</th>
+								<th width="20%">Category</th>
 								<th class="center" width="15%">Image</th>
 								<th width="5%">Status</th>
 								<th widht="5%"></th>
@@ -96,7 +96,7 @@
 								<label class="form-label col-md-3">Image</label>
 								<div class="col-md-9">
 									<input type="hidden" name="image_old">
-									<input type="file" name="image" class="form-control validate" accept=".png">
+									<input type="file" name="image" class="form-control validate" accept=".png, .jpg, .jpeg">
 								</div>
 							</div>
 							<div class="form-group row mb-2">
@@ -277,7 +277,7 @@
 						'<td class="center">' + no + '</td>' +
 						'<td class="nowrap">' + v.name + '</td>' +
 						'<td class="">' + v.description + '</td>' +
-						'<td class="">' + v.keyword + '</td>' +
+						'<td class="">' + v.category + '</td>' +
 						'<td class="center nowrap">' + image + '</td>' +
 						'<td class="nowrap">' + status + '</td>' +
 						'<td class="right nowrap">' +

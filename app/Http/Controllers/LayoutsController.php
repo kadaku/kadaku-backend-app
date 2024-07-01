@@ -186,7 +186,7 @@ class LayoutsController extends Controller
 			$file = $request->file('image');
 			$file_ext = 'webp';
 			$file_name = $slug;
-			$file_name_fix = $file_name . '.' . $file_ext;
+			$file_name_fix = $file_name . '-' . date('YmdHis') .  '.' . $file_ext;
 			$webp_image = $this->convert_to_webp($file->getPathname());
 
 			Storage::disk('public')->put($this->path . $file_name_fix, $webp_image);
@@ -195,15 +195,15 @@ class LayoutsController extends Controller
 		// end upload photo
 
 		if (empty($request->id)) {
-			$output = LayoutsModel::create($data);
+			$output = LayoutsModel::insertGetId($data);
 			if ($output) {
 				$content = [
 					'code' => 200,
 					'status' => true,
 					'message' => $this->message_add_success,
 					'data' => [
-						'id' => $output->lastInsertId(),
-					]
+						'id' => $output,
+					],
 				];
 				return response()->json($content, 200);
 			} else {

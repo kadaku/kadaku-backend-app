@@ -138,10 +138,12 @@ class InvitationsController extends Controller
 									'type' => $value->type,
 									'ref' => $value->ref,
 									'order' => $value->order,
+									'styles_custom' => $value->styles_custom,
+									'body' => $value->body,
 									'props' => $value->props,
 									'icon' => $value->icon,
 									'is_icon' => $value->is_icon,
-									'thumbnail' => $value->thumbnail,
+									'background' => $value->background,
 									'is_premium' => $value->is_premium,
 									'is_active' => $value->is_active,
 									'is_fixed' => $value->is_fixed,
@@ -462,6 +464,102 @@ class InvitationsController extends Controller
 					't.discount as theme_discount',
 					't.is_premium as theme_is_premium',
 					't.styles as theme_styles',
+					't.version as theme_version',
+					't.is_active as theme_is_active',
+					't.created_at as theme_created_at',
+					't.updated_at as theme_updated_at',
+					'c.id as category_id',
+					'c.slug as category_slug',
+					'c.icon as category_icon',
+					'c.meta_title as category_meta_title',
+					'c.meta_description as category_meta_description',
+					'c.name as category_name',
+					'c.is_active as category_is_active',
+					'c.created_at as category_created_at',
+					'c.updated_at as category_updated_at',
+					'tt.id as theme_type_id',
+					'tt.name as theme_type_name',
+					'tt.is_active as theme_type_is_active',
+					'tt.created_at as theme_type_created_at',
+					'tt.updated_at as theme_type_updated_at'
+				])
+				->where('t.id', $data->theme_id)
+				->first();
+				
+			$data->theme = $data_theme;
+
+			$data_theme_component = DB::table('t_theme_components as tc')
+				->select([
+					'tc.*',
+					DB::raw('(ROW_NUMBER() OVER ( PARTITION BY tc.name ORDER BY tc.order )) AS row_num')
+				])
+				->where('tc.theme_id', $data_theme->theme_id)
+				->where('tc.invitation_id', $data->id)
+				->where('tc.is_active', 1)
+				->orderBy('tc.order', 'asc')
+				->get();
+			$data->theme->components = $data_theme_component;
+
+			return response()->json([
+				'code' => 200,
+				'status' => true,
+				'message' => 'Data Found',
+				'data' => $data,
+			], 200);
+		} else {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Data Not Found',
+			], 400);
+		}
+	}
+
+	function get_by_domain_v2($domain = '')
+	{
+		if (isset($domain) && empty($domain)) {
+			return response()->json([
+				'code' => 400,
+				'status' => false,
+				'message' => 'Bad Request',
+			], 200);
+		}
+		$data = InvitationsModel::where('domain', '=', $domain)->first();
+		if ($data) {
+			if ($data->is_active == 0) {
+				return response()->json([
+					'code' => 400,
+					'status' => false,
+					'message' => 'Your Invitation Card Is Not Active',
+					'data' => [],
+				], 200);
+			}
+
+			if ($data->cover && Storage::disk('public')->exists($this->path_cover.$data->cover)) {
+				$data->cover = asset('storage/'.$this->path_cover.$data->cover);
+			}
+			if ($data->background_custom && Storage::disk('public')->exists($this->path_background_custom.$data->background_custom)) {
+				$data->background_custom = asset('storage/'.$this->path_background_custom.$data->background_custom);
+			}
+			if ($data->background_screen_guests && Storage::disk('public')->exists($this->path_background_screen_guests.$data->background_screen_guests)) {
+				$data->background_screen_guests = asset('storage/'.$this->path_background_screen_guests.$data->background_screen_guests);
+			}
+
+			$data_theme = DB::table('m_themes as t')
+				->leftJoin('m_categories as c', 'c.id', 't.category_id')
+				->leftJoin('m_themes_type as tt', 'tt.id', 't.type_id')
+				->select([
+					't.id as theme_id',
+					't.category_id as theme_category_id',
+					't.type_id as theme_type_id',
+					't.name as theme_name',
+					't.slug as theme_slug',
+					't.layout as theme_layout',
+					't.description as theme_description',
+					't.thumbnail as theme_thumbnail',
+					't.thumbnail_xs as theme_thumbnail_xs',
+					't.background as theme_background',
+					't.is_premium as theme_is_premium',
 					't.version as theme_version',
 					't.is_active as theme_is_active',
 					't.created_at as theme_created_at',

@@ -54,19 +54,131 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-label" data-bs-dismiss="modal"><i class="fas fa-circle-xmark label-icon align-middle fs-16 me-2"></i>Cancel</button>
-          <button type="button" class="btn btn-primary btn-label" onclick="storeEditableContent()"><i class="fas fa-save label-icon align-middle fs-16 me-2"></i>Update</button>
+          <button type="button" class="btn btn-primary btn-label" onclick="storeTextEditableContent()"><i class="fas fa-save label-icon align-middle fs-16 me-2"></i>Update</button>
         </div>
       </form>
 		</div>
 	</div>
 </div>
 
+<div class="modal fade" id="modal_media_editor" data-bs-backdrop="static">
+	<div class="modal-dialog modal-dialog-scrollable">
+		<div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal_form_components_label"><strong>Media</strong></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="" id="#form_media_editor">
+          @csrf
+        <input type="hidden" id="theme_id_editor">
+        <input type="hidden" id="section_id_editor">
+        <div class="row">
+          <div class="col-lg-12">
+            <ul class="nav nav-pills animation-nav nav-justified gap-2 mb-3" role="tablist">
+              <li class="nav-item waves-effect waves-light">
+                <a class="nav-link" data-bs-toggle="tab" href="#animation-gallery" role="tab">Gallery</a>
+              </li>
+              <li class="nav-item waves-effect waves-light">
+                <a class="nav-link active" data-bs-toggle="tab" href="#animation-assets" role="tab">Assets</a>
+              </li>
+            </ul>
+            <div class="tab-content text-muted">
+              <div class="tab-pane" id="animation-gallery" role="tabpanel">
+                
+              </div>
+              <div class="tab-pane active" id="animation-assets" role="tabpanel">
+                <div class="form-group mb-3">
+                  <select id="category_asset_media" class="form-select">
+                    @if (isset($categories_asset_media) && $categories_asset_media)
+                      @foreach ($categories_asset_media as $row)
+                        <option value="{{ $row }}">{{ $row }}</option>
+                      @endforeach
+                    @endif
+                  </select>
+                </div>
+                <div class="list_media_assets asset-media-editor" style="display:flex; flex-wrap: wrap;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-label" data-bs-dismiss="modal"><i class="fas fa-circle-xmark label-icon align-middle fs-16 me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-primary btn-label" onclick="storeMediaEditableContent()"><i class="fas fa-save label-icon align-middle fs-16 me-2"></i>Update</button>
+        </form>
+      </div>
+		</div>
+	</div>
+</div>
+
+<style>
+  .asset-media-editor input[type=radio]:checked+label {
+    border: 2px solid #ff6767;
+  }
+</style>
+
 <script>
+  $(function () {
+    $('#category_asset_media').change(function() {
+      getListMediaAssets()
+    })
+  })
+
   function rgbToHex(rgb) {
     var rgbValues = rgb.match(/\d+/g);
     return '#' + rgbValues.map(function (value) {
       return ('0' + parseInt(value).toString(16)).slice(-2);
     }).join('');
+  }
+
+  function getListMediaAssets() {
+    $.ajax({
+			type: 'GET',
+			url: baseUrl + '/asset-media/list',
+			data: 'page=1&is_all=1&category=' + $('#category_asset_media').val(),
+			cache: false,
+			dataType: 'JSON',
+			beforeSend: function() {
+				showLoader();
+        $('.list_media_assets').empty();
+			},
+			success: function(data) {
+				if (data.status) {
+          $.each(data.data.list, function(i, v) {
+            var html = `
+              <input type="radio" name="asset_media_source" id="asset-${v.id}" data-id="${v.id}" class="input-hidden" style="display: contents;" value="${v.url_file}">
+              <label for="asset-${v.id}"
+                style="
+                  border-radius: 14px;
+                  cursor: pointer;
+                  height: 110px;
+                  margin-bottom: 0;
+                  padding: 4px;
+                  width: 33.333%;"
+              >
+                <img src="${v.url_file}" alt="${v.name}" title="${v.name}" style="
+                  border-radius: .6rem;
+                  height: 100%;
+                  -o-object-fit: contain;
+                  object-fit: contain;
+                  transition: all .1s;
+                  width: 100%;
+                ">
+              </label>
+            `;
+
+            $('.list_media_assets').append(html);
+          });
+        }
+			},
+			complete: function() {
+				hideLoader();
+			},
+			error: function(e) {
+				toastrAlert('error', e.status, e.statusText);
+			}
+		});
   }
 </script>
 

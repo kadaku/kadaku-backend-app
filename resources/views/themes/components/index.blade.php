@@ -12,11 +12,13 @@
           <div class="row">	
             <div class="col-md-9">
               <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-4">
                   <div class="form-group mb-2">
                     <label class="form-label">Layout</label>
                     <input type="text" name="layout_id" id="layout_id" class="select2">
                   </div>
+                </div>
+                <div class="col-lg-12">
                   <div style="height: 495px; overflow-y: scroll; scroll-behavior: smooth;">
                     <div id="list_components"></div>
                   </div>
@@ -42,10 +44,11 @@
 
 @include('themes.components.modal_editor.index')
 
-{{-- <link href="{{ asset('extend/plugins/animate/animate.min.css') }}" rel="stylesheet" type="text/css"> --}}
+<link href="{{ asset('extend/plugins/animate/animate.min.css') }}" rel="stylesheet" type="text/css">
+<script src="{{ asset('extend/plugins/animate/animate.min.js') }}"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/theme/material-ocean.css"></link>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/theme/material-ocean.css"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/addon/hint/show-hint.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.js"></script>
@@ -76,7 +79,7 @@
     autoRefresh: true,
     keyMap: "sublime",
     tabSize: 4,
-    lineNumbers: false, 
+    lineNumbers: true, 
     indentWithTabs: true,
     matchBrackets: true,
   }
@@ -113,11 +116,16 @@
             <img src="${data.url_image}" width="60px" height="90px" style="border-radius: .5rem">
             <div>
               <p class="mb-2" style="font-size: 16px;"><b>${data.title}</b></p>
-              <p class="mb-1">Category : ${data.category}</p>
-              <p class="mb-1 d-flex align-items-center" style="gap: .6rem">
-                ${premium} 
-                <span>Premium</span>
-              </p>
+              <p class="mb-1">Category : ${data.category}</p>`
+            if (data.is_premium == 1) {
+              markup += `
+                <p class="mb-1 d-flex align-items-center" style="gap: .6rem">
+                  ${premium} 
+                  <span>Premium</span>
+                </p>
+              `;
+            } 
+        markup += `    
             </div>
           </div>
         `;
@@ -145,6 +153,7 @@
         $('#preview_components').empty()
         $('.code_editor').val('')
         $('.CodeMirror').remove()
+        $('#layout_id').select2('val', '')
 			},
 			success: function(data) {
 				if (data.status) {
@@ -206,9 +215,11 @@
         }
 			},
 			complete: function() {
-        var modal = new bootstrap.Modal(document.getElementById('modal_editor_component'));
+        var modalEditorComponent = new bootstrap.Modal(document.getElementById('modal_editor_component'));
+        var modalMediaEditor = new bootstrap.Modal(document.getElementById('modal_media_editor'));
         $(function () {
           $('#theme_id_editor').val(theme_id);
+          // text editable on click
           $('.editorbox .text-editable').on('click', function () {
             currentEditable = $(this);
             var dataSection = currentEditable.closest('.editorbox').data('section');
@@ -220,7 +231,21 @@
             $('#fontSize').val(parseInt(currentEditable.css('font-size')));
             $('#fontBold').prop('checked', currentEditable.css('font-weight') === '700' || currentEditable.css('font-weight') === 'bold');
             $('#fontItalic').prop('checked', currentEditable.css('font-style') === 'italic');
-            modal.show();
+            modalEditorComponent.show();
+          });
+          
+          // image editable on click
+          $('.editorbox .image-editable > img').on('click', function () {
+            getListMediaAssets()
+            currentEditable = $(this);
+            var dataSection = currentEditable.closest('.editorbox').data('section');
+            $('#section_id_editor').val(dataSection);
+
+            // $('#textColor').val(rgbToHex(currentEditable.css('color')));
+            // $('#fontSize').val(parseInt(currentEditable.css('font-size')));
+            // $('#fontBold').prop('checked', currentEditable.css('font-weight') === '700' || currentEditable.css('font-weight') === 'bold');
+            // $('#fontItalic').prop('checked', currentEditable.css('font-style') === 'italic');
+            modalMediaEditor.show();
           });
         })
 
@@ -252,7 +277,7 @@
 		});
 	}
 
-  function storeEditableContent() {
+  function storeTextEditableContent() {
     var updatedText = $('#textContent').val().replace(/\n/g, '<br>'); // Convert newlines to <br> before setting HTML
     currentEditable.html(updatedText);
     // currentEditable.html($('#textContent').val());
@@ -266,6 +291,23 @@
 
     updateDataComponent(0, dataSection, $('#theme_id_editor').val(), 'body', htmlContent)
     $('#modal_editor_component').modal('hide')
+  }
+
+  function storeMediaEditableContent() {
+    var selectedImage = document.querySelector('input[name="asset_media_source"]:checked');
+    if (selectedImage) {
+      currentEditable.attr('src', selectedImage.value)
+    }
+    
+    // console.log(currentEditable); 
+    // console.log(selectedImage.value); 
+    // console.log(selectedImage); return false; 
+    
+    var dataSection = currentEditable.closest('.editorbox').data('section');
+    var htmlContent = $('[data-section="' + dataSection + '"]').html();    
+
+    updateDataComponent(0, dataSection, $('#theme_id_editor').val(), 'body', htmlContent)
+    $('#modal_media_editor').modal('hide')
   }
 
   function showPreviewComponents(data) {
@@ -452,7 +494,7 @@
         } 
 
         htmlPreviewTheme += `
-          <div style="${styleBackgroundComponent != '' ? styleBackgroundComponent : styleBackground} width: 458px; height: 822px; position: relative; overflow: hidden; background-position: 100%; background-size: cover; background-color: var(--inv-bg);">
+          <div class="section_components" style="${styleBackgroundComponent != '' ? styleBackgroundComponent : styleBackground} width: 458px; height: 822px; position: relative; overflow: hidden; background-position: 100%; background-size: cover; background-color: var(--inv-bg);">
             <div class="theme ${v.name}">
               <div class="frame">
                 ${frame}

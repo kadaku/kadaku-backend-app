@@ -55,6 +55,11 @@ class ThemesController extends Controller
 				// $data[$i]->thumbnail_xs = NULL;
 				if ($value->thumbnail_xs && Storage::disk('public')->exists($path_thumbnail . $value->thumbnail_xs)) {
 					$data[$i]->thumbnail_xs = asset('storage/' . $path_thumbnail . $value->thumbnail_xs);
+				} else {
+					$path_thumbnail = 'images/themes';
+					if ($value->thumbnail_xs && Storage::disk('public')->exists($path_thumbnail . $value->thumbnail_xs)) {
+						$data[$i]->thumbnail_xs = asset('storage/' . $path_thumbnail . $value->thumbnail_xs);
+					}
 				}
 			}
 

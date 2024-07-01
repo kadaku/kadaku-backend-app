@@ -157,7 +157,7 @@
 								}
 							</style>
 
-							<div class="editor-wrapper rounded" style="background-color:lightgray; width: 468px; height: 832px; zoom: 0.6">
+							<div class="editor-wrapper rounded" style="background-color:rgb(245, 245, 245); width: 468px; height: 832px; zoom: 0.6">
 								<div class="panzoom position-absolute h-100 w-100">
 									<div class="h-100 w-100 d-flex align-items-center justify-content-center">
 										<div id="preview-layout" class="editor">
@@ -275,8 +275,10 @@
 		$('[name="category_layout_id"]').change(function() {
 			if ($(this).val() != '') {
 				$('[name="title"]').val($('[name="category_layout_id"] option:selected').text());
+				$('[name="order"]').val($(this).val());
 			} else {
 				$('[name="title"]').val('');
+				$('[name="order"]').val('1');
 			}
 		});
 
@@ -339,7 +341,7 @@
 							}
 
 							if (data.status) {
-								// $('#modal_form').modal('hide');
+								$('#modal_form').modal('hide');
 								var page = $('#page_list').val();
 								getListData(page);
 								resetForm();
@@ -427,7 +429,7 @@
 						'<td class="center nowrap">' + image + '</td>' +
 						'<td>' + v.category + '</td>' +
 						'<td>' + v.title + '</td>' +
-						'<td class="center">' + v.icon + '</td>' +
+						'<td class="center text-muted">' + v.icon + '</td>' +
 						'<td class="center">' + (v.is_premium == 1 ? premium : '') + '</td>' +
 						'<td class="center">' + v.order + '</td>' +
 						'<td class="nowrap">' + status + '</td>' +

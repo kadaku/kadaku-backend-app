@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssetMediaModel;
 use App\Models\ThemesModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class ThemesController extends Controller
 		$data['title'] = 'Themes';
 		$data['categories_themes'] = DB::table('m_categories')->where('is_active', 1)->get();
 		$data['themes_type'] = DB::table('m_themes_type')->where('is_active', 1)->get();
+		$data['categories_asset_media'] = AssetMediaModel::list_categories();
 		return view('themes.index', $data);
 	}
 

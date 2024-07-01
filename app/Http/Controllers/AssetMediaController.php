@@ -36,10 +36,17 @@ class AssetMediaController extends Controller
 
 		$param_search = [
 			'keyword' => $request->keyword,
+			'category' => $request->category,
+			'is_all' => isset($_GET['is_all']) ? 1 : 0,
 		];
 
 		$limit = 10;
 		$start = (((int) $request->page - 1) * $limit);
+
+		if ($param_search['is_all'] == 1) {
+			$start = 0;
+			$limit = 0;
+		}
 
 		$model = new AssetMediaModel();
 		$data = $model->list_data($start, $limit, $param_search);
@@ -138,7 +145,7 @@ class AssetMediaController extends Controller
 		// validation
 		$validator = Validator::make($request->all(), [
 			'name' => 'required|string|max:200',
-			'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+			'image' => 'nullable|image|mimes:jpeg,jpg,png|max:5048',
 		]);
 
 		$param_error['validate'] = false;
@@ -155,6 +162,7 @@ class AssetMediaController extends Controller
 			'name' => $request->name,
 			'description' => $request->description ? $request->description : NULL,
 			'keyword' => $request->keyword,
+			'category' => $request->category,
 		];
 
 		$directory_path = public_path($this->path);
