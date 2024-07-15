@@ -94,7 +94,7 @@
   <div class="container"> 
     <br>
     <div class="card">
-      <img src="https://ws.kadaku.id/storage/images/brand/logo.png" width="60" style="margin-bottom: 40px;" alt="">
+      <img src="https://app.kadaku.id/storage/images/brand/logo.png" width="60" style="margin-bottom: 40px;" alt="">
       <h1 style="font-size: 20px;font-weight: 700;margin-bottom: 15px;">Reset Your Password</h1>
       <hr style="border-style: dashed;border-top: 0.9px;border-color: lightgray">
       <h6 style="font-size: 14px">Hello, <span style="font-weight: 700;">{{ isset($name) ? $name : '' }}</span></h6>

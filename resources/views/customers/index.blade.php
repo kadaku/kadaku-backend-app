@@ -92,7 +92,7 @@
 					var no = ((i + 1) + ((data.data.page - 1) * data.data.limit));
 					var status = `<div class="form-check form-switch">
 									<input class="form-check-input me-1" type="checkbox" onclick="updateStatus(${v.id}, '${v.is_active}')" ${(v.is_active == 1 ? 'checked' : '')}>
-									<label class="form-check-label">${(v.is_active === 1 ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Unactive</span>')}</label>
+									<label class="form-check-label">${(v.is_active == 1 ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Unactive</span>')}</label>
 								</div>`;
 
 					var avatar = `<img src="${avatarDefault}" class="rounded-circle border shadow" width="34" height="34">`;
